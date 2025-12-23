@@ -1,0 +1,28 @@
+<div *ngIf="contributedNode" class="inline-component">
+    <span>Gripper Program Flow:</span>
+    <ur-dropdown
+        [options]="this.commandOpt"
+        [label]="'Command'"
+        [placeholder]="'- Select -'"
+        [selectedOption]="this.getCurrentCommand()"
+        (selectionChange)="this.onCommandChange($event)"
+    ></ur-dropdown>
+
+    @if (this.isArgInput()) {
+        <ur-dialog-number-input
+            [clearable]="true"
+            [disabled]="false"
+            label="Argument value"
+            keyboardLayout="numeric-free-positive"
+            [max]="this.contributedNode.parameters.commandArgMax"
+            [min]="this.contributedNode.parameters.commandArgMin"
+            [step]="0.1"
+            [placeholder]="this.contributedNode.parameters.commandArgDef"
+            [required]="false"
+            [suffix]="this.contributedNode.parameters.commandArgUnit"
+            (valueChanged)="this.contributedNode.parameters.commandArg = $event; this.saveNode();"
+            [value]="this.contributedNode.parameters.commandArg"
+        ></ur-dialog-number-input>
+    }
+</div>
+

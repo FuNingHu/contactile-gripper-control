@@ -1,0 +1,22 @@
+metadata:
+  vendorID: "contactile"
+  urcapID: "contactile-gripper"
+  vendorName: "Contactile"
+  urcapName: "Contactile Gripper"
+  version: 1.0.0
+artifacts:
+  webArchives:
+  - id: "contactile-gripper-frontend"
+    folder: "contactile-gripper-frontend"
+  
+  containers:
+  - id: "contactile-gripper-backend"
+    image: "contactile-gripper-backend:latest"
+    ingress:
+      - id: xmlrpc
+        containerPort: 36963
+        protocol: http
+        proxyUrl: /
+    devices:
+      - type: ttyTool
+  

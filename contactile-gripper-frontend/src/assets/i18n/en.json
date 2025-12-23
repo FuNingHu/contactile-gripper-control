@@ -1,0 +1,28 @@
+{
+    "application": {
+      "nodes": {
+        "contactile-contactile-gripper-contactile-gripper-app": {
+          "title": "Gripper App",
+          "supportiveText": "Connects to Gripper"
+        }
+      }
+    },
+    "program": {
+      "tree": {
+        "title": "Gripper Prog",
+        "nodes": {
+          "contactile-contactile-gripper-contactile-gripper-actions-prog": "Gripper Action",
+          "contactile-contactile-gripper-contactile-gripper-getdata-prog": "Gripper Get Data",
+          "contactile-contactile-gripper-contactile-gripper-setparameters-prog": "Gripper Set Parameters",
+          "contactile-contactile-gripper-contactile-gripper-programflow-prog": "Gripper Program Flow",
+          "contactile-contactile-gripper-contactile-gripper-stateerror-prog": "Gripper State/Error",
+          "contactile-contactile-gripper-contactile-gripper-activate-prog": "Gripper Activate"
+        }
+      }
+    },
+    "sidebar-items": {
+      "contactile-contactile-gripper-contactile-gripper-bar": {
+        "title": "Gripper Bar"
+      }
+    }
+}

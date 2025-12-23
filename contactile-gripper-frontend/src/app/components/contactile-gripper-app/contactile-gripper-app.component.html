@@ -1,0 +1,11 @@
+<div *ngIf="applicationNode && robotSettings" class="component">
+    <div class="section">
+      <!--<span>{{ 'presenter.contactile-gripper.label.description' | translate }}</span>-->
+      <ur-toggle-switch
+        [label]="'Open Port'"
+        [labelPos]="'after'"
+        (handleToggle)="handleToggle($event)"
+      ></ur-toggle-switch>
+
+    </div>
+  </div>

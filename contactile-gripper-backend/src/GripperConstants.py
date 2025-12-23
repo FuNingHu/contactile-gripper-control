@@ -1,0 +1,120 @@
+## COMMANDS
+# GET SENSOR DATA
+GET_VEL_STR =           'GET_VEL'
+GET_WIDTH_STR =         'GET_WIDTH'
+GET_IMU_STR =           'GET_IMU'
+GET_TACTILE_STR =       'GET_TACTILE'
+GET_TACTILE_GLOBAL_STR = 'GET_TACTILE_GLOBAL'
+# GET PARAMETERS
+PC_GET_VEL_STR =        'PC_GET_VEL'
+FF_GET_VEL_STR =        'FF_GET_VEL'
+FF_GET_FORCE_STR =      'FF_GET_FORCE'
+DF_GET_VEL_STR =        'DF_GET_VEL'
+DF_GET_EXF_STR =        'DF_GET_EXF'
+DF_GET_MXF_STR =        'DF_GET_MXF'
+DF_GET_DYN_EXF_STR =    'DF_GET_DYN_EXF'
+DF_GET_SHEARG_STR =     'DF_GET_SHEARG'
+DF_GET_TORQG_STR =      'DF_GET_TORQG'
+# GET/CLEAR STATE and ERRORS
+GET_STATE_STR =         'GET_STATE'
+GET_LAST_ERROR_STR =    'GET_LAST_ERROR'
+GET_HARDWARE_STATE_STR = 'GET_HARDWARE_STATE'
+CLEAR_LAST_ERROR_STR =  'CLEAR_LAST_ERROR'
+CLEAR_ERROR_STATE_STR = 'CLEAR_ERROR_STATE'
+# DATA STREAMING
+DATA_STREAM_STR =       'DATA_STREAM'
+DATA_STOP_STR =         'DATA_STOP'
+# SET PARAMETERS
+PC_SET_VEL_STR =        'PC_SET_VEL'
+FF_SET_VEL_STR =        'FF_SET_VEL'
+FF_SET_FORCE_STR =      'FF_SET_FORCE'
+DF_SET_VEL_STR =        'DF_SET_VEL'
+DF_SET_EXF_STR =        'DF_SET_EXF'
+DF_SET_MXF_STR =        'DF_SET_MXF'
+DF_DYN_EXF_EN_STR =     'DF_DYN_EXF_EN'
+DF_DYN_EXF_DIS_STR =    'DF_DYN_EXF_DIS'
+DF_SET_SHEARG_STR =     'DF_SET_SHEARG'
+DF_SET_TORQG_STR =      'DF_SET_TORQG'
+RESET_PARAMS_STR =      'RESET_PARAMS'
+# ACTION COMMANDS
+BIAS_STR =              'BIAS'
+STOP_STR =              'STOP'
+BRAKE_STR =             'BRAKE'
+RELEASE_STR =           'RELEASE'
+PC_MOVE_TO_WIDTH_STR =  'PC_MOVE_TO_WIDTH'
+FF_GRIP_STR =           'FF_GRIP'
+DF_GRIP_STR =           'DF_GRIP'
+
+## STATES
+ERROR_STATE =           -1
+IDLE_READY_STATE =      0
+IDLE_STOPPING_STATE =   1
+PC_MOVE_STATE =         2
+FF_APPROACH_STATE =     3
+FF_HOLD_STATE =         4
+DF_APPROACH_STATE =     5
+DF_HOLD_STATE =         6
+BRAKING_STATE =         7
+RELEASING_STATE =       8
+BUTTON_PRESS_STATE =    9
+
+## ERROR CODES: +ve numbers reserved for error states of the gripper (See GripperConstants.py); -ve numbers reserved for errors from the contactile_gripper_library (see GripperClass.py)
+ERR_NONE =                          0
+ERR_UNREACHABLE_WIDTH =             1
+ERR_UNREACHABLE_FORCE_POSLIM =      2
+ERR_UNREACHABLE_FORCE_FORCELIM =    3
+ERR_INSUFFICIENT_CONTACT =          4
+ERR_LOST_CONTACT =                  5
+ERR_HARDWARE_FAULT =                999
+
+## HARDWARE REGISTER 
+# TODO: Figure out how we're dealing with reporting hardware faults
+
+## DEFAULT PARAMETER VALUES
+DEFAULT_PC_VEL =        331.49
+DEFAULT_FF_VEL =        165.75
+DEFAULT_FF_FORCE =      5.0
+DEFAULT_DF_VEL =        165.75
+DEFAULT_DF_EXF =        5.0
+DEFAULT_DF_MXF = 	30.0
+DEFAULT_DF_DYN_EXF =    0
+DEFAULT_DF_SHEARG =     1.2
+DEFAULT_DF_TORQG =      0.0
+
+## RESPONSE TYPES
+ACK_STR =               'ACK'
+INV_STR =               'INV'
+INT_STR =               'INT'
+ERR_STR =               'ERR'
+COMP_STR =              'COMP'
+
+## COMMAND AND RESPONSE SPECIAL CHARACTERS
+NEW_LINE =              '\n'
+CMD_START =             '#'
+CMD_END =               '$'
+ARG_START =             ':'
+ARG_DELIM =             ','
+ACK_DELIM =             '|'
+
+## SENSOR CONSTANTS
+
+IMU_DOF =               6
+IMU_NDIM =              3
+IMU_ACC_OFFSET =        0
+IMU_GYR_OFFSET =        1
+IMU_N =                 2*IMU_NDIM
+TACTILE_GLOBAL_DOF =    6
+TACTILE_NDIM =          3
+TACTILE_NSENSOR =       2
+TACTILE_NPILLAR =       9
+TACTILE_FORCE_OFFSET =  0
+TACTILE_TORQUE_OFFSET = TACTILE_NDIM
+TACTILE_N =             TACTILE_NSENSOR*(TACTILE_GLOBAL_DOF + TACTILE_NPILLAR*TACTILE_NDIM + 1)
+TACTILE_GLOBAL_N = 	(TACTILE_GLOBAL_DOF + 1)*TACTILE_NSENSOR
+X_IND =                 0
+Y_IND =                 1
+Z_IND =                 2
+
+# 
+IS_INFO = False
+

@@ -1,0 +1,30 @@
+@if (contributedNode) {
+    <div class="inline-component">
+        <span>Gripper Set Parameters:</span>
+        <ur-dropdown
+            [options]="this.commandOpt"
+            [label]="'Command'"
+            [placeholder]="'- Select -'"
+            [selectedOption]="this.getCurrentCommand()"
+            (selectionChange)="this.onCommandChange($event)"
+        ></ur-dropdown>
+    
+        @if (this.isArgInput()) {
+            <ur-dialog-number-input
+                [clearable]="true"
+                [disabled]="false"
+                label="Argument value"
+                keyboardLayout="numeric-free-positive"
+                [max]="getCurrentArgMax()"
+                [min]="getCurrentArgMin()"
+                [step]="0.1"
+                [placeholder]="getCurrentArgDef().toString()"
+                [required]="false"
+                [suffix]="getCurrentArgUnit()"
+                (valueChanged)="onValueChange($event)"
+                [value]="this.contributedNode.parameters.commandArgArray[this.getCurrentCommandIndex()]"
+            ></ur-dialog-number-input>
+        }
+    </div>
+}
+

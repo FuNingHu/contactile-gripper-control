@@ -1,0 +1,173 @@
+<!-- SIDEBAR HEADING -->
+
+<br>
+<ur-heading style="text-align:center; font-weight: bold;">Contactile Gripper Control</ur-heading>
+<br><hr style="width:300px;"><br>
+
+<!-- GRIPPER CONTROL BUTTONS -->
+
+<div *ngIf="robotSettings" class="storybook-grid" style="width: 300px;">
+    <div class="ur-row ur-gap-07" style="width: 300px; align-content: center; align-items: center;">
+        <div style="padding:1px; margin: 0px;"></div>
+        <ur-tile-button (handleClick)="this.onFFGripButton()" [icon]="''" [disabled]="false" [active]="false" style="width: 100px;">
+            <ur-tile-icon>
+                <svg width="60" height="60" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <g id="Layer_1">
+                     <title>Layer 1</title>
+                     <image xlink:href="data:image/png;base64,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" xlink:href="data:image/png;base64,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" id="svg_1" height="60" width="62" y="1.11538" x="-1.03846"/>
+                    </g>
+                   </svg>
+            </ur-tile-icon>
+            
+        </ur-tile-button>
+        <ur-tile-button (handleClick)="this.onOpenButton()" [icon]="''" [disabled]="false" [active]="false" style="width: 100px;">
+            <!-- <ur-tile-icon>
+                <img src="./contactile-gripper/assets/icons/OpenButton_90.png">
+            </ur-tile-icon> -->
+            OPEN
+        </ur-tile-button>
+    </div>
+    <br>
+    <div class="ur-row ur-gap-07" style="width: 300px;">
+        <div style="padding:1px; margin: 0px;"></div>
+        <ur-tile-button (handleClick)="this.onDFGripButton()" [icon]="''" [disabled]="false" [active]="false" style="width: 100px;">
+            <!-- <ur-tile-icon>
+                <img src="../assets/icons/DFGripbutton_90.png">
+            </ur-tile-icon> -->
+            DF_GRIP
+        </ur-tile-button>
+        <ur-tile-button (handleClick)="this.onCloseButton()" [icon]="''" [disabled]="false" [active]="false" style="width: 100px;">
+            <!-- <ur-tile-icon>
+                <img src="../../assets/icons/Closebutton_90.png">
+            </ur-tile-icon> -->
+            CLOSE
+        </ur-tile-button>
+    </div>
+    <br>
+    <div class="ur-row ur-gap-07" style="width: 300px;">
+        <div style="padding:1px; margin: 0px;"></div>
+        <ur-tile-button (handleClick)="this.onReleaseButton()" [icon]="''" [disabled]="false" [active]="false" style="width: 100px;">
+        <!-- <ur-tile-icon>
+            <img src="../../../assets/icons/Releasebutton_90.png">
+        </ur-tile-icon> -->
+            RELEASE
+        </ur-tile-button>
+        <ur-tile-button (handleClick)="this.onStopButton()" [icon]="''" [disabled]="false" [active]="false" style="width: 100px;">
+            <!-- <ur-tile-icon>
+                <img src="./contactile-gripper/assets/icons/Stopbutton_90.png">
+            </ur-tile-icon> -->
+            STOP
+        </ur-tile-button>
+    </div>
+</div>
+<br><hr><br>
+
+<!-- VALUES -->
+
+<div class="values"> 
+    <div class="ur-row ur-gap-07" style="width: 300px;">
+        <div style="padding:1px; margin: 0px;"></div>
+        <ur-label [label]="'WIDTH: '" style="width:100px; text-align:left;"></ur-label>
+        <ur-label [label]="this.getWidth().toString()" style="width:100px; text-align:right;"></ur-label>
+    </div>
+    <br>
+    <div class="ur-row ur-gap-07" style="width: 300px;">
+        <div style="padding:1px; margin: 0px;"></div>
+        <ur-label [label]="'STATE: '" style="width:100px; text-align:left;"></ur-label>
+        <ur-label [label]="this.getState().toString()" style="width:100px; text-align:right;"></ur-label>
+    </div>
+    <br>
+    <div class="ur-row ur-gap-07" style="width: 300px;">
+        <div style="padding:1px; margin: 0px;"></div>
+        <ur-label [label]="'LAST_ERROR:'" style="width:100px; text-align:left;"></ur-label>
+        <ur-label [label]="this.getLastError().toString()" style="width:100px; text-align:right;"></ur-label>
+    </div>
+    <br>
+    <div class="ur-row ur-gap-07" style="width: 300px;">
+        <div style="padding:1px; margin: 0px;"></div>
+        <ur-button
+            (clicked)="this.updateAllVals()"
+            type="filled"
+            [disabled]="false"
+            icon=""
+            iconAlign="left"
+            [active]="false"
+            style="width: 200px;"
+        >
+            UPDATE
+        </ur-button>
+    </div>
+    </div>
+    <br><hr><br>
+
+<!-- BUTTONS -->
+<div class="buttons"> 
+    <div class="ur-row ur-gap-07" style="width: 300px;">
+        <div style="padding:1px; margin: 0px;"></div>
+        <ur-button
+            (clicked)="this.onBiasButton()"
+            type="filled"
+            [disabled]="false"
+            icon=""
+            iconAlign="left"
+            [active]="false"
+            style="width: 60px;"
+        >
+            BIAS
+        </ur-button>
+        <ur-button
+            (clicked)="this.onResetParamsButton()"
+            type="filled"
+            [disabled]="false"
+            icon=""
+            iconAlign="left"
+            [active]="false"
+            style="width: 100px;"
+        >
+            RESET_PARAMS
+        </ur-button>
+    </div>
+    <br>
+    <div class="ur-row ur-gap-07" style="width: 300px;">
+        <div style="padding:1px; margin: 0px;"></div>
+        <ur-button
+            (clicked)="this.onFlushButton()"
+            type="filled"
+            [disabled]="false"
+            icon=""
+            iconAlign="left"
+            [active]="false"
+            style="width: 60px;"
+        >
+            FLUSH
+        </ur-button>
+        <ur-button
+            (clicked)="this.onClearErrorStateButton()"
+            type="filled"
+            [disabled]="false"
+            icon=""
+            iconAlign="left"
+            [active]="false"
+            style="width: 100px;"
+        >
+            CLEAR_ERROR_STATE
+        </ur-button>
+    </div>
+    <br><hr><br>
+</div>
+
+<!-- MESSAGE AREA -->
+
+<div class="message"> 
+    <div class="ur-row ur-gap-07" style="width: 300px;">
+        <div style="padding:1px; margin: 0px;"></div>
+        <ur-label [label]="'GRIPPER RESPONSE'" style="width: 300px;"></ur-label>
+    </div>
+    <br>
+    <div class="ur-row ur-gap-07" style="width: 300px;">
+        <div style="padding:1px; margin: 0px;"></div>
+        <ur-thing-card style="width: 300px;">
+            <p><ur-label [label]="this.getMessage()"></ur-label></p>
+        </ur-thing-card>
+    </div>
+</div>

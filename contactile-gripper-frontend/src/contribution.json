@@ -1,0 +1,73 @@
+
+{
+  "applicationNodes": [
+    {
+      "translationPath": "assets/i18n/",
+      "iconURI": "assets/icons/contactile-fingerprint.svg",
+      "behaviorURI": "contactile-gripper-app.worker.js",
+      "presenterURI": "main.js",
+      "componentTagName": "contactile-contactile-gripper-contactile-gripper-app"
+    }
+  ],
+  "sidebarItems": [
+    {
+      "name": "contactile-contactile-gripper-contactile-gripper-bar",
+      "iconURI": "assets/icons/contactile-fingerprint.svg",
+      "presenterURI": "main.js",
+      "componentTagName": "contactile-contactile-gripper-contactile-gripper-bar",
+      "behaviorURI": "contactile-gripper-bar.worker.js",
+      "translationPath": "assets/i18n/"
+    }],
+    "programNodes": [
+      {
+        "excludeFromToolbox": false,
+        "translationPath": "assets/i18n/",
+        "iconURI": "assets/icons/contactile-fingerprint.svg",
+        "behaviorURI": "contactile-gripper-actions-prog.worker.js",
+        "presenterURI": "main.js",
+        "componentTagName": "contactile-contactile-gripper-contactile-gripper-actions-prog"
+      },
+      {
+        "excludeFromToolbox": false,
+        "translationPath": "assets/i18n/",
+        "iconURI": "assets/icons/contactile-fingerprint.svg",
+        "behaviorURI": "contactile-gripper-getdata-prog.worker.js",
+        "presenterURI": "main.js",
+        "componentTagName": "contactile-contactile-gripper-contactile-gripper-getdata-prog"
+      },
+      {
+        "excludeFromToolbox": false,
+        "translationPath": "assets/i18n/",
+        "iconURI": "assets/icons/contactile-fingerprint.svg",
+        "behaviorURI": "contactile-gripper-setparameters-prog.worker.js",
+        "presenterURI": "main.js",
+        "componentTagName": "contactile-contactile-gripper-contactile-gripper-setparameters-prog"
+      },
+      {
+        "excludeFromToolbox": false,
+        "translationPath": "assets/i18n/",
+        "iconURI": "assets/icons/contactile-fingerprint.svg",
+        "behaviorURI": "contactile-gripper-programflow-prog.worker.js",
+        "presenterURI": "main.js",
+        "componentTagName": "contactile-contactile-gripper-contactile-gripper-programflow-prog"
+      },
+      {
+        "excludeFromToolbox": false,
+        "translationPath": "assets/i18n/",
+        "iconURI": "assets/icons/contactile-fingerprint.svg",
+        "behaviorURI": "contactile-gripper-stateerror-prog.worker.js",
+        "presenterURI": "main.js",
+        "componentTagName": "contactile-contactile-gripper-contactile-gripper-stateerror-prog"
+      },
+      {
+        "excludeFromToolbox": false,
+        "translationPath": "assets/i18n/",
+        "iconURI": "assets/icons/contactile-fingerprint.svg",
+        "behaviorURI": "contactile-gripper-activate-prog.worker.js",
+        "presenterURI": "main.js",
+        "componentTagName": "contactile-contactile-gripper-contactile-gripper-activate-prog"
+      }
+    ],
+  "smartSkills": [],
+  "operatorScreens": []
+}
