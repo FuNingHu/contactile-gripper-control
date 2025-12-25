@@ -20,7 +20,7 @@ const createProgramNodeLabel = async (node: ContactileGripperSetParametersProgNo
         if( ContactileGripperSetParametersProgConstants.commandIsArg[ContactileGripperSetParametersProgConstants.commandOpt.indexOf(node.parameters.commandStr)] ) {
             // Check if arrays are initialized before accessing
             if (node.parameters.commandArgArray && node.parameters.commandArgUnitArray) {
-                return `${node.parameters.commandStr}:${node.parameters.commandArgArray[index]} ${node.parameters.commandArgUnitArray[index]}`;
+                return `${node.parameters.commandStr} : ${node.parameters.commandArgArray[index]} ${node.parameters.commandArgUnitArray[index]}`;
             }
             return `${node.parameters.commandStr}`;
         }else{
@@ -37,12 +37,12 @@ const createProgramNode = async(): Promise<ContactileGripperSetParametersProgNod
     lockChildren: false,
     allowsChildren: false,
     parameters: { 
-        commandStr:"BIAS",
+        commandStr:ContactileGripperSetParametersProgConstants.commandOpt[0],
         commandArgArray:ContactileGripperSetParametersProgConstants.commandArgDef,
-        commandArgUnitArray: ContactileGripperSetParametersProgConstants.commandArgUnits,
+        commandArgUnitArray:ContactileGripperSetParametersProgConstants.commandArgUnits,
         commandArgMinArray: ContactileGripperSetParametersProgConstants.commandArgMin,
         commandArgMaxArray: ContactileGripperSetParametersProgConstants.commandArgMax,
-        commandArgDefArray: ContactileGripperSetParametersProgConstants.commandArgDef,
+        commandArgDefArray: ContactileGripperSetParametersProgConstants.commandArgDef
     },
 });
 

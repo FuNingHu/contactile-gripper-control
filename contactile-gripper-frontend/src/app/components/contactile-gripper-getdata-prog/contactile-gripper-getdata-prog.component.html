@@ -14,14 +14,14 @@
             [disabled]="false"
             label="Argument value"
             keyboardLayout="numeric-free-positive"
-            [max]="this.contributedNode.parameters.commandArgMax"
-            [min]="this.contributedNode.parameters.commandArgMin"
+            [max]="this.getCurrentArgMax()"
+            [min]="this.getCurrentArgMin()"
             [step]="0.1"
-            [placeholder]="this.contributedNode.parameters.commandArgDef"
+            [placeholder]= "this.contributedNode.parameters.commandArgArray[this.getCurrentCommandIndex()].toString()"
             [required]="false"
-            [suffix]="this.contributedNode.parameters.commandArgUnit"
-            (valueChanged)="this.contributedNode.parameters.commandArg = $event; this.saveNode();"
-            [value]="this.contributedNode.parameters.commandArg"
+            [suffix]="this.contributedNode.parameters.commandArgUnitArray[this.getCurrentCommandIndex()]"
+            (valueChanged)="this.onValueChange($event)"
+            [value]="this.contributedNode.parameters.commandArgArray[this.getCurrentCommandIndex()]"
         ></ur-dialog-number-input>
     }
 </div>

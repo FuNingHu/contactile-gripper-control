@@ -3,7 +3,12 @@
       "nodes": {
         "contactile-contactile-gripper-contactile-gripper-app": {
           "title": "Contactile Gripper App",
-          "supportiveText": "Connects to Gripper"
+          "supportiveText": "Connects to Gripper",
+          "Serial_Port": "Serial Port",
+          "Close": "Close",
+          "Open": "Open",
+          "Message": "Message",
+          "Gripper_Response": "Gripper Response"
         }
       }
     },

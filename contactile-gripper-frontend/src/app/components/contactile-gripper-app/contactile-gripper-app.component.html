@@ -1,35 +1,26 @@
-<div *ngIf="applicationNode && robotSettings" class="component">
-  <div class="ur-row ur-gap-07" style="width: 300px;">
-    <div style="padding:1px; margin: 0px;"></div>
-    <ur-label [label]="'SERIAL PORT'"></ur-label>
-  </div>
-  <br><br>
-  <div class="ur-row ur-gap-07" style="width: 300px;">
-    <div style="padding:1px; margin: 0px;"></div>
-    <ur-label [label]="'Close'"></ur-label>
-    <ur-toggle-switch (handleToggle)="this.handleToggle($event)" [disabled]="this.isDisable()"
+<div *ngIf="applicationNode && robotSettings" class="inline-component">
+  <ur-label
+    [label]="'application.nodes.contactile-contactile-gripper-contactile-gripper-app.Serial_Port' | translate"
+    [size]="'large'"></ur-label>
+  <div>
+    <ur-toggle-switch 
+      (handleToggle)="this.handleToggle($event)" 
+      [disabled]="!isDaemonReachable"
+      [labelPosition]="'after'"
+      [label]="'Open'"
       [toggle]="this.isConnected()"></ur-toggle-switch>
-    <ur-label [label]="'Open'"></ur-label>
   </div>
-  <br><br>
-  <div class="ur-row ur-gap-07" style="width: 300px;">
-    <div style="padding:1px; margin: 0px;"></div>
-    <ur-label [label]="'Message'" style="width:100px; text-align:right;"></ur-label>
-    <ur-label [label]="'{{getMessage()}}'" style="width:100px; text-align:right;"></ur-label>
+
+  <div>
+    <ur-label [label]="'Message'" [size]="'large'" style="width:100px; text-align:right;"></ur-label>
+    <ur-label [label]="'{{getMessage()}}'" [size]="'large'" style="width:100px; text-align:right;"></ur-label>
   </div>
   <div class="message">
-    <div class="ur-row ur-gap-07" style="width: 300px;">
-      <div style="padding:1px; margin: 0px;"></div>
-      <ur-label [label]="'GRIPPER RESPONSE'" style="width: 300px;"></ur-label>
-    </div>
-    <br>
-    <div class="ur-row ur-gap-07" style="width: 300px;">
-      <div style="padding:1px; margin: 0px;"></div>
-      <ur-thing-card style="width: 300px;">
-        <p><ur-label [label]="this.getMessage()"></ur-label></p>
-      </ur-thing-card>
-    </div>
+    <ur-label [label]="'GRIPPER RESPONSE'" [size]="'large'" style="width: 300px;"></ur-label>
   </div>
+  <ur-thing-card style="width: 300px;">
+    <p>this.getMessage()</p>
+  </ur-thing-card>
 </div>
 
 <!-- <br><hr style="width:300px;"><br> -->

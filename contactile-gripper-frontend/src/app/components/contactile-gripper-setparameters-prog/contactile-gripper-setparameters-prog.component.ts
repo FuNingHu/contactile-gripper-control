@@ -5,7 +5,6 @@ import { ContactileGripperSetParametersProgNode } from './contactile-gripper-set
 import { ContactileGripperSetParametersProgConstants } from './contactile-gripper-setparameters-prog-constants';
 import { first } from 'rxjs/operators';
 import { StringToken } from '@angular/compiler';
-import { XmlRpc } from '../xmlRpc';
 
 @Component({
     templateUrl: './contactile-gripper-setparameters-prog.component.html',
@@ -80,7 +79,7 @@ export class ContactileGripperSetParametersProgComponent implements OnChanges, P
     }
 
     getCurrentCommandIndex(): number {
-        if (!this.contributedNode?.parameters?.commandStr){
+        if (!this.contributedNode?.parameters?.commandStr){ 
             return -1;
         }
         return ContactileGripperSetParametersProgConstants.commandOpt.indexOf(this.contributedNode.parameters.commandStr);
@@ -118,23 +117,21 @@ export class ContactileGripperSetParametersProgComponent implements OnChanges, P
 
     onCommandChange($event: any): void{
         this.contributedNode.parameters.commandStr = $event.toString();
-        // this.contributedNode.parameters.commandArgUnit = this.getCurrentArgUnit();
-        // this.contributedNode.parameters.commandArgMin = this.getCurrentArgMin();
-        // this.contributedNode.parameters.commandArgMax = this.getCurrentArgMax();
-        // this.contributedNode.parameters.commandArgDef = this.getCurrentArgDef();
         this.saveNode();
     }
-    onValueChange($event: number): void{
+
+    onValueChange($event: any): void{
         const index = this.getCurrentCommandIndex();
-        if (index >= 0) {
-            // Ensure commandArgArray is initialized
-            if (!this.contributedNode.parameters.commandArgArray) {
+        if(index>=0){
+            // Ensure commandArgArray is initialised
+            if(!this.contributedNode.parameters.commandArgArray){
                 this.contributedNode.parameters.commandArgArray = [...ContactileGripperSetParametersProgConstants.commandArgDef];
             }
             this.contributedNode.parameters.commandArgArray[index] = $event;
-            this.saveNode();
+            this.saveNode;
         }
     }
+
      // call saveNode to save node parameters
      async saveNode() {
         this.cd.detectChanges();

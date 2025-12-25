@@ -32,7 +32,7 @@ export class ContactileGripperBarComponent implements SidebarItemPresenter {
   // robotSettings is optional
   @Input() robotSettings: RobotSettings;
 
-  ngOnChanges(changes: SimpleChanges): void {
+  async ngOnChanges(changes: SimpleChanges): Promise<void> {
     if (changes.robotSettings) {
         if (!changes.robotSettings.currentValue) {
             return;
@@ -41,8 +41,7 @@ export class ContactileGripperBarComponent implements SidebarItemPresenter {
       }
 
       if (changes.presenterAPI?.isFirstChange()) {
-        const path = this.presenterAPI.getContainerContributionURL(VENDOR_ID, URCAP_ID, 'contactile-gripper-backend', 'xmlrpc');
-        this.xmlrpc = new XmlRpcClient(`//${path}/`);
+        this.translateService.setDefaultLang('en');
         this.isSerialOpen = true;
         this.width = ContactileConstants.commandError;
         this.state = ContactileConstants.commandError;
@@ -51,8 +50,10 @@ export class ContactileGripperBarComponent implements SidebarItemPresenter {
   
       let url = this.presenterAPI.getContainerContributionURL(VENDOR_ID, URCAP_ID, 'contactile-gripper-backend', 'xmlrpc');
       this.xmlrpc = new XmlRpcClient(`${location.protocol}//${url}/`);
-      this.xmlrpc.doRequest('isSerialOpen',[]).then( res => 
-        this.enableDisableAll(res));
+      this.xmlrpc.methodCall('isReachable').then(res => 
+        console.log("isReachable: ",res));
+      // this.xmlrpc.doRequest('isSerialOpen',[]).then( res => 
+      //   this.enableDisableAll(res));
   }
 
   enableDisableAll(res: number){

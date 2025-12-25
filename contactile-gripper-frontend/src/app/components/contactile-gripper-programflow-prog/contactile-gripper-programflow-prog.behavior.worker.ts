@@ -15,9 +15,14 @@ import { numberAttribute } from '@angular/core';
 
 // programNodeLabel is required
 const createProgramNodeLabel = async (node: ContactileGripperProgramFlowProgNode): Promise<string> => {
+    let index = ContactileGripperProgramFlowProgConstants.commandOpt.indexOf(node.parameters.commandStr);
     if(node.parameters.commandStr !== undefined){  
         if( ContactileGripperProgramFlowProgConstants.commandIsArg[ContactileGripperProgramFlowProgConstants.commandOpt.indexOf(node.parameters.commandStr)] ) {
-            return `${node.parameters.commandStr}:${node.parameters.commandArg} ${node.parameters.commandArgUnit}`;
+            // Check if arrays are initialized before accessing
+            if (node.parameters.commandArgArray && node.parameters.commandArgUnitArray) {
+                return `${node.parameters.commandStr} : ${node.parameters.commandArgArray[index]} ${node.parameters.commandArgUnitArray[index]}`;
+            }
+            return `${node.parameters.commandStr}`;
         }else{
             return `${node.parameters.commandStr}`;
         }
@@ -32,12 +37,12 @@ const createProgramNode = async(): Promise<ContactileGripperProgramFlowProgNode>
     lockChildren: false,
     allowsChildren: false,
     parameters: { 
-        commandStr:"waitUntil_IDLE_READY",
-        commandArg:5.0,
-        commandArgUnit:"s",
-        commandArgMin:0.1,
-        commandArgMax:5.0,
-        commandArgDef:5.0
+        commandStr:ContactileGripperProgramFlowProgConstants.commandOpt[0],
+        commandArgArray:ContactileGripperProgramFlowProgConstants.commandArgDef,
+        commandArgUnitArray:ContactileGripperProgramFlowProgConstants.commandArgUnits,
+        commandArgMinArray: ContactileGripperProgramFlowProgConstants.commandArgMin,
+        commandArgMaxArray: ContactileGripperProgramFlowProgConstants.commandArgMax,
+        commandArgDefArray: ContactileGripperProgramFlowProgConstants.commandArgDef
     },
 });
 
@@ -46,7 +51,11 @@ const generateScriptCodeBefore = async (node: ContactileGripperProgramFlowProgNo
     const builder = new ScriptBuilder();
     var ind = ContactileGripperProgramFlowProgConstants.commandOpt.indexOf(node.parameters.commandStr);
     if( ContactileGripperProgramFlowProgConstants.commandIsArg[ind] ) {
-        builder.addStatements(`${ContactileGripperProgramFlowProgConstants.commandRetVar[ind]} = contactileRPC.${ContactileGripperProgramFlowProgConstants.commandRpcStr[ind]}(${node.parameters.commandArg})\n`);
+        // Check if commandArgArray is initialized before accessing
+        const argValue = node.parameters.commandArgArray && node.parameters.commandArgArray[ind] !== undefined 
+            ? node.parameters.commandArgArray[ind] 
+            : ContactileGripperProgramFlowProgConstants.commandArgDef[ind];
+        builder.addStatements(`${ContactileGripperProgramFlowProgConstants.commandRetVar[ind]} = contactileRPC.${ContactileGripperProgramFlowProgConstants.commandRpcStr[ind]}(${argValue})\n`);
     }else{
         builder.addStatements(`${ContactileGripperProgramFlowProgConstants.commandRetVar[ind]} = contactileRPC.${ContactileGripperProgramFlowProgConstants.commandRpcStr[ind]}()\n`);
     }
@@ -61,7 +70,7 @@ const generatePreambleScriptCode = (node: ContactileGripperProgramFlowProgNode):
 
 // validator is optional
 const validate = async (node: ContactileGripperProgramFlowProgNode, context: ValidationContext): Promise<ValidationResponse> => ({ 
-    isValid: node.parameters.commandArg !== undefined
+    isValid: true
 });
 
 // allowsChild is optional

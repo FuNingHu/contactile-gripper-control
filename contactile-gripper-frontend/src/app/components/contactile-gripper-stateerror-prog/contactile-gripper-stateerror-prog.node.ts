@@ -4,11 +4,11 @@ export interface ContactileGripperStateErrorProgNode extends ProgramNode {
     type: string;
     parameters: {
         commandStr: string;
-        commandArg: number;
-        commandArgUnit: string;
-        commandArgMin: number;
-        commandArgMax: number;
-        commandArgDef: number;
+        commandArgArray: number[];
+        commandArgUnitArray: string[];
+        commandArgMinArray: number[];
+        commandArgMaxArray: number[];
+        commandArgDefArray: number[];
     };
     lockChildren?: boolean;
     allowsChildren?: boolean;

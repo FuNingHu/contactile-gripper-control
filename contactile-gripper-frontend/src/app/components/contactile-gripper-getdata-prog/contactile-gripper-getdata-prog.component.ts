@@ -5,7 +5,6 @@ import { ContactileGripperGetDataProgNode } from './contactile-gripper-getdata-p
 import { ContactileGripperGetDataProgConstants } from './contactile-gripper-getdata-prog-constants';
 import { first } from 'rxjs/operators';
 import { StringToken } from '@angular/compiler';
-import { XmlRpc } from '../xmlRpc';
 
 @Component({
     templateUrl: './contactile-gripper-getdata-prog.component.html',
@@ -30,7 +29,7 @@ export class ContactileGripperGetDataProgComponent implements OnChanges, Program
     private commandArgMax : number;
     private commandArgDef : number;
     
-    private commandOpt : string[]; // Copy the list of options from ContactileGripperGetDataProgConstants (because can't access constants in html file)
+    commandOpt : string[]; // Copy the list of options from ContactileGripperGetDataProgConstants (because can't access constants in html file)
     
     constructor(
         protected readonly translateService: TranslateService,
@@ -80,40 +79,57 @@ export class ContactileGripperGetDataProgComponent implements OnChanges, Program
     }
 
     getCurrentCommandIndex(): number {
-        if (!this.contributedNode?.parameters?.commandStr){
+        if (!this.contributedNode?.parameters?.commandStr){ 
             return -1;
         }
         return ContactileGripperGetDataProgConstants.commandOpt.indexOf(this.contributedNode.parameters.commandStr);
     }
 
     isArgInput(): boolean {
-        return ContactileGripperGetDataProgConstants.commandIsArg[ContactileGripperGetDataProgConstants.commandOpt.indexOf(this.contributedNode.parameters.commandStr)];
+        const index = this.getCurrentCommandIndex();
+        if (index < 0) return false;
+        return ContactileGripperGetDataProgConstants.commandIsArg[index];
     }
 
     getCurrentArgUnit(): string {
-        return ContactileGripperGetDataProgConstants.commandArgUnits[ContactileGripperGetDataProgConstants.commandOpt.indexOf(this.contributedNode.parameters.commandStr)];
+        const index = this.getCurrentCommandIndex();
+        if (index < 0) return '';
+        return ContactileGripperGetDataProgConstants.commandArgUnits[index];
     }
 
     getCurrentArgMin(): number {
-        return ContactileGripperGetDataProgConstants.commandArgMin[ContactileGripperGetDataProgConstants.commandOpt.indexOf(this.contributedNode.parameters.commandStr)];
+        const index = this.getCurrentCommandIndex();
+        if (index < 0) return 0;
+        return ContactileGripperGetDataProgConstants.commandArgMin[index];
     }
 
     getCurrentArgMax(): number {
-        return ContactileGripperGetDataProgConstants.commandArgMax[ContactileGripperGetDataProgConstants.commandOpt.indexOf(this.contributedNode.parameters.commandStr)];
+        const index = this.getCurrentCommandIndex();
+        if (index < 0) return 0;
+        return ContactileGripperGetDataProgConstants.commandArgMax[index];
     }
 
     getCurrentArgDef(): number {
-        return ContactileGripperGetDataProgConstants.commandArgDef[ContactileGripperGetDataProgConstants.commandOpt.indexOf(this.contributedNode.parameters.commandStr)];
+        const index = this.getCurrentCommandIndex();
+        if (index < 0) return 0;
+        return ContactileGripperGetDataProgConstants.commandArgDef[index];
     }
-
 
     onCommandChange($event: any): void{
         this.contributedNode.parameters.commandStr = $event.toString();
-        this.contributedNode.parameters.commandArgUnit = this.getCurrentArgUnit();
-        this.contributedNode.parameters.commandArgMin = this.getCurrentArgMin();
-        this.contributedNode.parameters.commandArgMax = this.getCurrentArgMax();
-        this.contributedNode.parameters.commandArgDef = this.getCurrentArgDef();
         this.saveNode();
+    }
+
+    onValueChange($event: any): void{
+        const index = this.getCurrentCommandIndex();
+        if(index>=0){
+            // Ensure commandArgArray is initialised
+            if(!this.contributedNode.parameters.commandArgArray){
+                this.contributedNode.parameters.commandArgArray = [...ContactileGripperGetDataProgConstants.commandArgDef];
+            }
+            this.contributedNode.parameters.commandArgArray[index] = $event;
+            this.saveNode;
+        }
     }
 
      // call saveNode to save node parameters

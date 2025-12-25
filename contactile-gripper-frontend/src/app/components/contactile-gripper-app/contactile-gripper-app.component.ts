@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { first } from 'rxjs/operators';
 import { ApplicationPresenterAPI, ApplicationPresenter, RobotSettings } from '@universal-robots/contribution-api';
@@ -15,15 +15,8 @@ import { XmlRpcClient } from 'src/app/xmlrpc/xmlrpc-client';
     standalone: false,
 })
 export class ContactileGripperAppComponent implements ApplicationPresenter, OnChanges {
-    private xmlrpc: XmlRpcClient;
-    private isDaemonReachable: boolean;
-    private isSerialConnected: boolean;
-    private message: string;
-
-    constructor(protected readonly translateService: TranslateService) {}
-
     // presenterAPI is optional
-    @Input() presenterAPI: ApplicationPresenterAPI;
+    @Input() applicationAPI: ApplicationPresenterAPI;
 
     // applicationNode is required
     @Input() applicationNode: ContactileGripperAppNode;
@@ -31,45 +24,84 @@ export class ContactileGripperAppComponent implements ApplicationPresenter, OnCh
     // robotSettings is optional
     @Input() robotSettings: RobotSettings;
 
+
+    private xmlrpc: XmlRpcClient;
+    isDaemonReachable: boolean = false;
+    private isSerialConnected: boolean = false;
+    private message: string = '';
+
+    constructor(
+        protected readonly translateService: TranslateService,
+        protected readonly cd: ChangeDetectorRef
+    ) {}
+
     ngOnChanges(changes: SimpleChanges): void {
         if (changes?.robotSettings) {
             if (!changes?.robotSettings?.currentValue) {
                 return;
             }
+
+            if (changes?.robotSettings?.isFirstChange()) {
+                if (changes?.robotSettings?.currentValue) {
+                    this.translateService.use(changes?.robotSettings?.currentValue?.language);
+                }
+                this.translateService.setDefaultLang('en');
+            }
+
+            this.translateService
+                .use(changes?.robotSettings?.currentValue?.language)
+                .pipe(first())
+                .subscribe(() => {
+                    this.cd.detectChanges();
+                });
+
         
-            this.translateService.use(changes?.robotSettings?.currentValue?.language).pipe(first()).subscribe();
+        // Check if presenterAPI is available before using it
+        
+            const url = this.applicationAPI.getContainerContributionURL(VENDOR_ID, URCAP_ID, 'contactile-gripper-backend', 'xmlrpc');
+            this.xmlrpc = new XmlRpcClient(`${location.protocol}//${url}/`);
+            
+            // Check if daemon is reachable and update isDaemonReachable
+            this.xmlrpc.methodCall('isReachable')
+                .then(res => {
+                    console.log("Is daemon reachable: ", res);
+                    this.isDaemonReachable = res as unknown as boolean;
+                    console.log("isDaemonReachable set to: ", this.isDaemonReachable);
+                    this.cd.detectChanges();
+                });
         }
-        
-        if (changes?.robotSettings?.isFirstChange()) {
-            this.translateService.setDefaultLang('en');
-            const path = this.presenterAPI.getContainerContributionURL(VENDOR_ID, URCAP_ID, 'contactile-gripper-backend', 'xmlrpc');
-            this.xmlrpc = new XmlRpcClient(`//${path}/`);
-            this.isDaemonReachable = true;
-            this.isSerialConnected = true;
-            this.message = "Serial Connected"
-        }
-        
-        let url = this.presenterAPI.getContainerContributionURL(VENDOR_ID, URCAP_ID, 'contactile-gripper-backend', 'xmlrpc');
-        this.xmlrpc = new XmlRpcClient(`${location.protocol}//${url}/`);
     }
 
-    async handleToggle($event: any) {
-        // Check if xmlrpc server is reachable
-        var res = 0;
-        var res = await this.xmlrpc.doRequest('isReachable',[]);
-        this.enableDisableAll(res); // disable toggle switch if Daemon is not reachable
-        this.message = this.generateMessage('isReachable',res);
-        if (res!=0){
-            return;
-        }
+    // async handleToggle($event: any) {
+    //     // Check if xmlrpc is initialized
+    //     if (!this.xmlrpc) {
+    //         console.error('XML-RPC client not initialized');
+    //         return;
+    //     }
         
-        if (!this.isSerialConnected){ // Connect to the serial port
-            this.xmlrpc.doRequest('serialStart',[]).then( res => 
-                this.connect(res));
-        }else{ // Disconnect from serial port
-            this.xmlrpc.doRequest('serialStop',[]).then( res => 
-                this.disconnect(-1));
-        }
+    //     // Check if xmlrpc server is reachable
+    //     try {
+    //         var res = await this.xmlrpc.methodCall('isReachable');
+    //         this.enableDisableAll(Number(res)); // disable toggle switch if Daemon is not reachable
+    //         this.message = this.generateMessage('isReachable', Number(res));
+    //         if (Number(res) !== 0) {
+    //             return;
+    //         }
+            
+    //         if (!this.isSerialConnected) { // Connect to the serial port
+    //             this.xmlrpc.methodCall('serialStart').then(res => 
+    //                 this.connect(res as number));
+    //         } else { // Disconnect from serial port
+    //             this.xmlrpc.methodCall('serialStop').then(res => 
+    //                 this.disconnect(res as number));
+    //         }
+    //     } catch (error) {
+    //         console.error('XML-RPC call failed:', error);
+    //         this.disableAll();
+    //     }
+    // }
+    async handleToggle($event: any) {
+        console.log("Handle toggle event: ", $event);
     }
 
     connect(res: number){
@@ -106,9 +138,6 @@ export class ContactileGripperAppComponent implements ApplicationPresenter, OnCh
         return this.isSerialConnected;
     }
 
-    isDisable() : boolean{
-        return !this.isDaemonReachable;
-    }
 
     getMessage(): string{
         return this.message
@@ -119,6 +148,11 @@ export class ContactileGripperAppComponent implements ApplicationPresenter, OnCh
             return commandStr + ": Success!";
         }
         return commandStr + ": Failed. ADD MORE DETAIL.";
+    }
+    // call saveNode to save node parameters
+    saveNode() {
+        this.cd.detectChanges();
+        this.applicationAPI.applicationNodeService.updateNode(this.applicationNode);
     }
 
 }
