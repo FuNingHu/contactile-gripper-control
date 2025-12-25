@@ -2,27 +2,27 @@
     "application": {
       "nodes": {
         "contactile-contactile-gripper-contactile-gripper-app": {
-          "title": "Gripper App",
+          "title": "Contactile Gripper App",
           "supportiveText": "Connects to Gripper"
         }
       }
     },
     "program": {
       "tree": {
-        "title": "Gripper Prog",
+        "title": "Contactile Gripper Prog",
         "nodes": {
-          "contactile-contactile-gripper-contactile-gripper-actions-prog": "Gripper Action",
-          "contactile-contactile-gripper-contactile-gripper-getdata-prog": "Gripper Get Data",
-          "contactile-contactile-gripper-contactile-gripper-setparameters-prog": "Gripper Set Parameters",
-          "contactile-contactile-gripper-contactile-gripper-programflow-prog": "Gripper Program Flow",
-          "contactile-contactile-gripper-contactile-gripper-stateerror-prog": "Gripper State/Error",
-          "contactile-contactile-gripper-contactile-gripper-activate-prog": "Gripper Activate"
+          "contactile-contactile-gripper-contactile-gripper-actions-prog": "Action",
+          "contactile-contactile-gripper-contactile-gripper-getdata-prog": "Get Data",
+          "contactile-contactile-gripper-contactile-gripper-setparameters-prog": "Set Parameters",
+          "contactile-contactile-gripper-contactile-gripper-programflow-prog": "Program Flow",
+          "contactile-contactile-gripper-contactile-gripper-stateerror-prog": "State/Error",
+          "contactile-contactile-gripper-contactile-gripper-activate-prog": "Activate"
         }
       }
     },
     "sidebar-items": {
       "contactile-contactile-gripper-contactile-gripper-bar": {
-        "title": "Gripper Bar"
+        "title": "Contactile Gripper Bar"
       }
     }
 }

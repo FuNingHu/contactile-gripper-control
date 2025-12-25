@@ -5,7 +5,6 @@ import { ContactileGripperActionsProgNode } from './contactile-gripper-actions-p
 import { ContactileGripperActionsProgConstants } from './contactile-gripper-actions-prog-constants';
 import { first } from 'rxjs/operators';
 import { StringToken } from '@angular/compiler';
-import { XmlRpc } from '../xmlRpc';
 
 @Component({
     templateUrl: './contactile-gripper-actions-prog.component.html',
@@ -80,40 +79,57 @@ export class ContactileGripperActionsProgComponent implements OnChanges, Program
     }
 
     getCurrentCommandIndex(): number {
-        if (!this.contributedNode?.parameters?.commandStr){
+        if (!this.contributedNode?.parameters?.commandStr){ 
             return -1;
         }
         return ContactileGripperActionsProgConstants.commandOpt.indexOf(this.contributedNode.parameters.commandStr);
     }
 
     isArgInput(): boolean {
-        return ContactileGripperActionsProgConstants.commandIsArg[ContactileGripperActionsProgConstants.commandOpt.indexOf(this.contributedNode.parameters.commandStr)];
+        const index = this.getCurrentCommandIndex();
+        if (index < 0) return false;
+        return ContactileGripperActionsProgConstants.commandIsArg[index];
     }
 
     getCurrentArgUnit(): string {
-        return ContactileGripperActionsProgConstants.commandArgUnits[ContactileGripperActionsProgConstants.commandOpt.indexOf(this.contributedNode.parameters.commandStr)];
+        const index = this.getCurrentCommandIndex();
+        if (index < 0) return '';
+        return ContactileGripperActionsProgConstants.commandArgUnits[index];
     }
 
     getCurrentArgMin(): number {
-        return ContactileGripperActionsProgConstants.commandArgMin[ContactileGripperActionsProgConstants.commandOpt.indexOf(this.contributedNode.parameters.commandStr)];
+        const index = this.getCurrentCommandIndex();
+        if (index < 0) return 0;
+        return ContactileGripperActionsProgConstants.commandArgMin[index];
     }
-    
+
     getCurrentArgMax(): number {
-        return ContactileGripperActionsProgConstants.commandArgMax[ContactileGripperActionsProgConstants.commandOpt.indexOf(this.contributedNode.parameters.commandStr)];
+        const index = this.getCurrentCommandIndex();
+        if (index < 0) return 0;
+        return ContactileGripperActionsProgConstants.commandArgMax[index];
     }
 
     getCurrentArgDef(): number {
-        return ContactileGripperActionsProgConstants.commandArgDef[ContactileGripperActionsProgConstants.commandOpt.indexOf(this.contributedNode.parameters.commandStr)];
+        const index = this.getCurrentCommandIndex();
+        if (index < 0) return 0;
+        return ContactileGripperActionsProgConstants.commandArgDef[index];
     }
-
 
     onCommandChange($event: any): void{
         this.contributedNode.parameters.commandStr = $event.toString();
-        this.contributedNode.parameters.commandArgUnit = this.getCurrentArgUnit();
-        this.contributedNode.parameters.commandArgMin = this.getCurrentArgMin();
-        this.contributedNode.parameters.commandArgMax = this.getCurrentArgMax();
-        this.contributedNode.parameters.commandArgDef = this.getCurrentArgDef();
         this.saveNode();
+    }
+
+    onValueChange($event: any): void{
+        const index = this.getCurrentCommandIndex();
+        if(index>=0){
+            // Ensure commandArgArray is initialised
+            if(!this.contributedNode.parameters.commandArgArray){
+                this.contributedNode.parameters.commandArgArray = [...ContactileGripperActionsProgConstants.commandArgDef];
+            }
+            this.contributedNode.parameters.commandArgArray[index] = $event;
+            this.saveNode;
+        }
     }
 
      // call saveNode to save node parameters

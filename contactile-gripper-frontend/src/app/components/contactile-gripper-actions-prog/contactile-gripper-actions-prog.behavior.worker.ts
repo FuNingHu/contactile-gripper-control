@@ -15,9 +15,14 @@ import { numberAttribute } from '@angular/core';
 
 // programNodeLabel is required
 const createProgramNodeLabel = async (node: ContactileGripperActionsProgNode): Promise<string> => {
+    let index = ContactileGripperActionsProgConstants.commandOpt.indexOf(node.parameters.commandStr);
     if(node.parameters.commandStr !== undefined){  
         if( ContactileGripperActionsProgConstants.commandIsArg[ContactileGripperActionsProgConstants.commandOpt.indexOf(node.parameters.commandStr)] ) {
-            return `${node.parameters.commandStr}:${node.parameters.commandArg} ${node.parameters.commandArgUnit}`;
+            // Check if arrays are initialized before accessing
+            if (node.parameters.commandArgArray && node.parameters.commandArgUnitArray) {
+                return `${node.parameters.commandStr} : ${node.parameters.commandArgArray[index]} ${node.parameters.commandArgUnitArray[index]}`;
+            }
+            return `${node.parameters.commandStr}`;
         }else{
             return `${node.parameters.commandStr}`;
         }
@@ -32,12 +37,12 @@ const createProgramNode = async(): Promise<ContactileGripperActionsProgNode> => 
     lockChildren: false,
     allowsChildren: false,
     parameters: { 
-        commandStr: "PC_MOVE_TO_WIDTH",
-        commandArg: 0,
-        commandArgUnit:"mm",
-        commandArgMin:0,
-        commandArgMax:175,
-        commandArgDef:100,
+        commandStr:ContactileGripperActionsProgConstants.commandOpt[0],
+        commandArgArray:ContactileGripperActionsProgConstants.commandArgDef,
+        commandArgUnitArray:ContactileGripperActionsProgConstants.commandArgUnits,
+        commandArgMinArray: ContactileGripperActionsProgConstants.commandArgMin,
+        commandArgMaxArray: ContactileGripperActionsProgConstants.commandArgMax,
+        commandArgDefArray: ContactileGripperActionsProgConstants.commandArgDef
     },
 });
 
@@ -46,7 +51,11 @@ const generateScriptCodeBefore = async (node: ContactileGripperActionsProgNode):
     const builder = new ScriptBuilder();
     var ind = ContactileGripperActionsProgConstants.commandOpt.indexOf(node.parameters.commandStr);
     if( ContactileGripperActionsProgConstants.commandIsArg[ind] ) {
-        builder.addStatements(`${ContactileGripperActionsProgConstants.commandRetVar[ind]} = contactileRPC.${ContactileGripperActionsProgConstants.commandRpcStr[ind]}(${node.parameters.commandArg})\n`);
+        // Check if commandArgArray is initialized before accessing
+        const argValue = node.parameters.commandArgArray && node.parameters.commandArgArray[ind] !== undefined 
+            ? node.parameters.commandArgArray[ind] 
+            : ContactileGripperActionsProgConstants.commandArgDef[ind];
+        builder.addStatements(`${ContactileGripperActionsProgConstants.commandRetVar[ind]} = contactileRPC.${ContactileGripperActionsProgConstants.commandRpcStr[ind]}(${argValue})\n`);
     }else{
         builder.addStatements(`${ContactileGripperActionsProgConstants.commandRetVar[ind]} = contactileRPC.${ContactileGripperActionsProgConstants.commandRpcStr[ind]}()\n`);
     }
@@ -61,7 +70,7 @@ const generatePreambleScriptCode = (node: ContactileGripperActionsProgNode): Opt
 
 // validator is optional
 const validate = async (node: ContactileGripperActionsProgNode, context: ValidationContext): Promise<ValidationResponse> => ({ 
-    isValid: node.parameters.commandArg !== undefined
+    isValid: true
 });
 
 // allowsChild is optional

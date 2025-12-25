@@ -1,1 +1,17 @@
 @import '../../../styles.scss';
+
+::ng-deep ur-tile-button button[disabled] .contactile_pink {
+    fill: #000000 !important;;
+}
+
+::ng-deep ur-tile-button button[disabled] .contactile_black_line {
+    stroke: #000000 !important;;
+}
+
+::ng-deep ur-tile-button button[disabled] .contactile_black_object {
+    stroke: #000000 !important;;
+}
+
+::ng-deep ur-tile-button button[disabled] .contactile_blue {
+    fill: #555555 !important;;
+}

@@ -1,11 +1,50 @@
 <div *ngIf="applicationNode && robotSettings" class="component">
-    <div class="section">
-      <!--<span>{{ 'presenter.contactile-gripper.label.description' | translate }}</span>-->
-      <ur-toggle-switch
-        [label]="'Open Port'"
-        [labelPos]="'after'"
-        (handleToggle)="handleToggle($event)"
-      ></ur-toggle-switch>
-
+  <div class="ur-row ur-gap-07" style="width: 300px;">
+    <div style="padding:1px; margin: 0px;"></div>
+    <ur-label [label]="'SERIAL PORT'"></ur-label>
+  </div>
+  <br><br>
+  <div class="ur-row ur-gap-07" style="width: 300px;">
+    <div style="padding:1px; margin: 0px;"></div>
+    <ur-label [label]="'Close'"></ur-label>
+    <ur-toggle-switch (handleToggle)="this.handleToggle($event)" [disabled]="this.isDisable()"
+      [toggle]="this.isConnected()"></ur-toggle-switch>
+    <ur-label [label]="'Open'"></ur-label>
+  </div>
+  <br><br>
+  <div class="ur-row ur-gap-07" style="width: 300px;">
+    <div style="padding:1px; margin: 0px;"></div>
+    <ur-label [label]="'Message'" style="width:100px; text-align:right;"></ur-label>
+    <ur-label [label]="'{{getMessage()}}'" style="width:100px; text-align:right;"></ur-label>
+  </div>
+  <div class="message">
+    <div class="ur-row ur-gap-07" style="width: 300px;">
+      <div style="padding:1px; margin: 0px;"></div>
+      <ur-label [label]="'GRIPPER RESPONSE'" style="width: 300px;"></ur-label>
+    </div>
+    <br>
+    <div class="ur-row ur-gap-07" style="width: 300px;">
+      <div style="padding:1px; margin: 0px;"></div>
+      <ur-thing-card style="width: 300px;">
+        <p><ur-label [label]="this.getMessage()"></ur-label></p>
+      </ur-thing-card>
     </div>
   </div>
+</div>
+
+<!-- <br><hr style="width:300px;"><br> -->
+
+<!-- MESSAGE AREA -->
+<!-- <div class="message"> 
+  <div class="ur-row ur-gap-07" style="width: 300px;">
+      <div style="padding:1px; margin: 0px;"></div>
+      <ur-label [label]="'GRIPPER RESPONSE'" style="width: 300px;"></ur-label>
+  </div>
+  <br>
+  <div class="ur-row ur-gap-07" style="width: 300px;">
+      <div style="padding:1px; margin: 0px;"></div>
+      <ur-thing-card style="width: 300px;">
+          <p><ur-label [label]="this.getMessage()"></ur-label></p>
+      </ur-thing-card>
+  </div>
+</div> -->
