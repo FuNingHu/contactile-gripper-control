@@ -27,13 +27,12 @@ TIMEOUT_READ =          0.1
 TIMEOUT_RESPONSE = 	0.1
 IS_DEBUG = False
 IS_CONNECTED = False
-# 配置日志
+# 配置日志 - 仅输出到控制台，避免文件权限问题
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('gripper_daemon.log'),  # 保存到文件
-        logging.StreamHandler()  # 同时输出到控制台
+        logging.StreamHandler()  # 只输出到控制台
     ]
 )
 logger = logging.getLogger('GripperDaemon')
@@ -102,7 +101,7 @@ class GripperClass_NoProcess:
 		return not self.isSerialOpen()
 	# Flush the serial input buffer - in case command/response is out of synch
 	def __flushSerialInputBuffer__(self):
-		if not self.gripperSerialPort.is_open:
+		if self.gripperSerialPort is None or not self.gripperSerialPort.is_open:
 			if IS_DEBUG:
 				print('DBG: GripperClass.flushSerialInputBuffer: COMPORT not open')
 			return COMMAND_SUCCESS
@@ -115,6 +114,11 @@ class GripperClass_NoProcess:
 			print('DBG: GripperClass.flushSerialInputBuffer: Flushed')
 		return COMMAND_SUCCESS
 	def __readLine__(self):
+		if self.gripperSerialPort is None:
+			if IS_DEBUG:
+				print('DBG: GripperClass.readLine: Serial port is None')
+			return ""
+		
 		start_time = time.time()
 		i = self.buf.find(b"\n")
 		if i >= 0:
@@ -128,8 +132,13 @@ class GripperClass_NoProcess:
 		while True:
 			if time.time() - start_time > TIMEOUT_RESPONSE:
 				return ""
-			i = max(1,min(2048,self.gripperSerialPort.in_waiting))
-			data = self.gripperSerialPort.read(i)
+			try:
+				i = max(1,min(2048,self.gripperSerialPort.in_waiting))
+				data = self.gripperSerialPort.read(i)
+			except Exception as e:
+				if IS_DEBUG:
+					print(f'ERR: GripperClass.readLine: {type(e).__name__}: {str(e)}')
+				return ""
 			i = data.find(b"\n")
 			if i >= 0:
 				r = self.buf + data[:i+1]
@@ -143,10 +152,19 @@ class GripperClass_NoProcess:
 				self.buf.extend(data)
 	# Builds the command string and sends it to the gripper 
 	def __sendGripperCommand__(self, cmdStr):
-		nWritten = self.gripperSerialPort.write(cmdStr) # bytes(cmdStr,'ascii'))
-		if IS_DEBUG:
-			print('DBG: GripperClass.sendGripperCommand: Sent ' + str(nWritten) + ' characters')
-		return nWritten > 0
+		if self.gripperSerialPort is None:
+			if IS_DEBUG:
+				print('DBG: GripperClass.sendGripperCommand: Serial port is None')
+			return False
+		try:
+			nWritten = self.gripperSerialPort.write(cmdStr) # bytes(cmdStr,'ascii'))
+			if IS_DEBUG:
+				print('DBG: GripperClass.sendGripperCommand: Sent ' + str(nWritten) + ' characters')
+			return nWritten > 0
+		except Exception as e:
+			if IS_DEBUG:
+				print(f'ERR: GripperClass.sendGripperCommand: {type(e).__name__}: {str(e)}')
+			return False
 	# Helper function for the getGripperResponse function
 	def __resolveRetVals__(self, argStrs):
 		retVals = list()

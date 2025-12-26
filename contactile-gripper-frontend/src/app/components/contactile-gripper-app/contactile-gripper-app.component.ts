@@ -107,7 +107,7 @@ export class ContactileGripperAppComponent implements ApplicationPresenter, OnCh
             this.cd.detectChanges();
             
             try {
-                const res = await this.xmlrpc.methodCall('serialStart');
+                const res = await this.xmlrpc.methodCall('serialStart', '/dev/ur-ttylink/ttyTool');
                 const result = res as unknown as boolean;
                 
                 if (result === true) {

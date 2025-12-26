@@ -39,7 +39,8 @@ class MultithreadedSimpleXMLRPCServer(ThreadingMixIn, SimpleXMLRPCServer):
 
 comPortStr = "/dev/ur-ttylink/ttyTool"
 gripper = GripperClass.GripperClass_NoProcess()
-gripper.serialStart(comPortStr)
+# Don't auto-start serial port - let frontend control it
+# gripper.serialStart(comPortStr)
 
 def isReachable():
 	return True
@@ -55,20 +56,15 @@ def getText():
 
 def serialStart(port_name):
 	global gripper
-	gripper = GripperClass.GripperClass_NoProcess()
-	gripper.serialStart(port_name)
+	return gripper.serialStart(port_name)
 
-def serialStop(port_name):
+def serialStop():
 	global gripper
-	gripper.serialStop()
+	return gripper.serialStop()
 
 def isSerialOpen():
 	global gripper
-	if gripper is not None:
-		result = gripper.serialStop()
-		gripper = None  # release instance
-		return result
-	return False
+	return gripper.isSerialOpen()
 
 
 
