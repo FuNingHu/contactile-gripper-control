@@ -25,10 +25,8 @@ export class ContactileGripperAppComponent implements ApplicationPresenter, OnCh
     @Input() robotSettings: RobotSettings;
 
 
-    private xmlrpc: XmlRpcClient;
+    xmlrpc: XmlRpcClient;
     isDaemonReachable: boolean = false;
-    private isSerialConnected: boolean = false;
-    private message: string = '';
 
     constructor(
         protected readonly translateService: TranslateService,
@@ -55,18 +53,17 @@ export class ContactileGripperAppComponent implements ApplicationPresenter, OnCh
                     this.cd.detectChanges();
                 });
 
-        
-        // Check if presenterAPI is available before using it
-        
+
+            // Check if presenterAPI is available before using it
+
             const url = this.applicationAPI.getContainerContributionURL(VENDOR_ID, URCAP_ID, 'contactile-gripper-backend', 'xmlrpc');
             this.xmlrpc = new XmlRpcClient(`${location.protocol}//${url}/`);
-            
+
             // Check if daemon is reachable and update isDaemonReachable
             this.xmlrpc.methodCall('isReachable')
                 .then(res => {
                     console.log("Is daemon reachable: ", res);
                     this.isDaemonReachable = res as unknown as boolean;
-                    console.log("isDaemonReachable set to: ", this.isDaemonReachable);
                     this.cd.detectChanges();
                 });
         }
@@ -102,45 +99,74 @@ export class ContactileGripperAppComponent implements ApplicationPresenter, OnCh
     // }
     async handleToggle($event: any) {
         console.log("Handle toggle event: ", $event);
-    }
-
-    connect(res: number){
-        this.isSerialConnected = (res == 0);
-        console.log("Is serial connected: ",res)
-    }
-
-    disconnect(res: number){
-        this.isSerialConnected = (res != 0);
-        console.log("Is serial connected: ",res)
-    }
-
-    enableDisableAll(res: number){
-        console.log("Is Daemon reachable: ",res)
-        if(res == 0){
-          this.enableAll();
-        }else{
-          this.disableAll()
+        
+        if(!this.applicationNode.isSerialConnected) {
+            // User wants to open serial port
+            // State 1: Show "Opening Serial Port..." message
+            this.applicationNode.gripperResponse = "Opening Serial Port...";
+            this.cd.detectChanges();
+            
+            try {
+                const res = await this.xmlrpc.methodCall('serialStart');
+                const result = res as unknown as boolean;
+                
+                if (result === true) {
+                    // State 2: Success - keep toggle on Open
+                    this.applicationNode.isSerialConnected = true;
+                    this.applicationNode.gripperResponse = "Serial Port is Open.";
+                    console.log('Serial port opened successfully');
+                } else {
+                    // State 3: Failed - return toggle to Closed
+                    this.applicationNode.isSerialConnected = false;
+                    this.applicationNode.gripperResponse = "Serial Port is Closed.";
+                    console.log('Serial port failed to open, result:', result);
+                }
+            } catch (error) {
+                // State 3: Error - return toggle to Closed
+                console.error('Failed to open serial port:', error);
+                this.applicationNode.isSerialConnected = false;
+                this.applicationNode.gripperResponse = "Serial Port is Closed.";
+            }
+            
+            // Force change detection and save
+            this.cd.detectChanges();
+            this.saveNode();
+        } else {
+            // User wants to close serial port
+            this.applicationNode.gripperResponse = "Closing Serial Port...";
+            this.cd.detectChanges();
+            
+            try {
+                const res = await this.xmlrpc.methodCall('serialStop');
+                const result = res as unknown as boolean;
+                
+                if (result === true) {
+                    this.applicationNode.isSerialConnected = false;
+                    this.applicationNode.gripperResponse = "Serial Port is Closed.";
+                    console.log('Serial port closed successfully');
+                } else {
+                    // Failed to close (should rarely happen)
+                    console.log('Serial port failed to close properly, result:', result);
+                    this.applicationNode.isSerialConnected = false;
+                    this.applicationNode.gripperResponse = "Serial Port is Closed.";
+                }
+            } catch (error) {
+                console.error('Failed to close serial port:', error);
+                this.applicationNode.isSerialConnected = false;
+                this.applicationNode.gripperResponse = "Serial Port is Closed.";
+            }
+            
+            // Force change detection and save
+            this.cd.detectChanges();
+            this.saveNode();
         }
     }
 
-    enableAll(){
-        this.isDaemonReachable = true;
-        this.message = this.generateMessage('isDaemonReachable',0);
-    }
     
-    disableAll(){
-        this.isSerialConnected = false;
-        this.isDaemonReachable = false;    
-        this.message = this.generateMessage('isDaemonReachable',-1);
-    }
-
-    isConnected() : boolean {
-        return this.isSerialConnected;
-    }
-
 
     getMessage(): string{
-        return this.message
+        // return this.message
+        return "Gripper Response";
     }
 
     private generateMessage(commandStr: string, res: number): string{

@@ -5,8 +5,8 @@
           "title": "Contactile Gripper App",
           "supportiveText": "Connects to Gripper",
           "Serial_Port": "Serial Port",
-          "Close": "Close",
-          "Open": "Open",
+          "Closed": "Closed",
+          "Opened": "Opened",
           "Message": "Message",
           "Gripper_Response": "Gripper Response"
         }

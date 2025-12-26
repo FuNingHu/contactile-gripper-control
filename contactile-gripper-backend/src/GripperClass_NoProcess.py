@@ -1,4 +1,4 @@
-import serial       # pip install pyserial 
+import serial       # pip install pyserial   # pyright: ignore[reportMissingModuleSource]
 import time         # time 
 #from multiprocessing import Process, Queue
 
