@@ -6,7 +6,7 @@ import {TranslateService} from "@ngx-translate/core";
 import {first} from "rxjs";
 import { ReturnStatement } from '@angular/compiler';
 import {ContactileConstants} from '../../../contactile-constants';
-import { XmlRpcClient } from 'src/app/xmlrpc/xmlrpc-client';
+import { XmlRpcClient } from 'src/app/components/xmlrpc/xmlrpc-client';
 
 @Component({
   templateUrl: './contactile-gripper-bar.component.html',
@@ -20,11 +20,10 @@ export class ContactileGripperBarComponent implements SidebarItemPresenter {
   public readonly cd = inject(ChangeDetectorRef);
   // public showErrorMessage = signal<boolean>(false);
   private xmlrpc: XmlRpcClient;
-  private isSerialOpen: boolean;
-  private width: number;
-  private state: number;
-  private last_error: number; 
-  private message: string;
+  width: string;
+  state: string;
+  last_error: string; 
+  message: string;
 
   // presenterAPI is optional
   @Input() presenterAPI: SidebarPresenterAPI;
@@ -40,15 +39,28 @@ export class ContactileGripperBarComponent implements SidebarItemPresenter {
         this.translateService.use(changes.robotSettings.currentValue.language).pipe(first()).subscribe();
       }
 
+      if (changes?.robotSettings?.isFirstChange()) {
+        if (changes?.robotSettings?.currentValue) {
+            this.translateService.use(changes?.robotSettings?.currentValue?.language);
+        }
+        this.translateService.setDefaultLang('en');
+    }
+
+      this.translateService
+        .use(changes?.robotSettings?.currentValue?.language)
+        .pipe(first())
+        .subscribe(() => {
+            this.cd.detectChanges();
+        });
       if (changes.presenterAPI?.isFirstChange()) {
         this.translateService.setDefaultLang('en');
-        this.isSerialOpen = true;
         this.width = ContactileConstants.commandError;
         this.state = ContactileConstants.commandError;
         this.last_error = ContactileConstants.commandError;
       }
   
       let url = this.presenterAPI.getContainerContributionURL(VENDOR_ID, URCAP_ID, 'contactile-gripper-backend', 'xmlrpc');
+      console.log("url: ", url);
       this.xmlrpc = new XmlRpcClient(`${location.protocol}//${url}/`);
       this.xmlrpc.methodCall('isReachable').then(res => 
         console.log("isReachable: ",res));
@@ -56,141 +68,100 @@ export class ContactileGripperBarComponent implements SidebarItemPresenter {
       //   this.enableDisableAll(res));
   }
 
-  enableDisableAll(res: number){
-    console.log("isSerialOpen: ",res)
-    if(res == 0){
-      this.enableAll();
-    }else{
-      this.disableAll()
-    }
-  }
-
-  enableAll(){
-    this.isSerialOpen = true;
-  }
-
-  disableAll(){
-    this.isSerialOpen = false;    
-    this.message = this.generateMessage('isSerialOpen',-1);
-  }
-  
-  isDisable() : boolean{
-    return !this.isSerialOpen;
-  }
-
   async updateAllVals(){
-    var res = 0;  
-    this.width = await this.xmlrpc.doRequest('gripper_get_width',[]);
-    if (this.width == ContactileConstants.commandError){
-      this.message = this.generateMessage('GET_WIDTH',this.width);
+    this.width = await this.xmlrpc.methodCall('gripper_get_width');
+    if (this.width === ContactileConstants.commandError){
+      this.message = this.generateMessage('GET_WIDTH', this.width);
       return;
     }
-    this.state = await this.xmlrpc.doRequest('gripper_get_state',[]);
-    if (this.state == ContactileConstants.commandError){
-      this.message = this.generateMessage('GET_STATE',this.state);
+    
+    this.state = await this.xmlrpc.methodCall('gripper_get_state');
+    if (this.state === ContactileConstants.commandError){
+      this.message = this.generateMessage('GET_STATE', this.state);
       return;
     }
-    this.last_error = await this.xmlrpc.doRequest('gripper_get_last_error',[]);
-    if (this.last_error == ContactileConstants.commandError){
-      this.message = this.generateMessage('GET_LAST_ERROR',this.last_error);
+    
+    this.last_error = await this.xmlrpc.methodCall('gripper_get_last_error');
+    if (this.last_error === ContactileConstants.commandError){
+      this.message = this.generateMessage('GET_LAST_ERROR', this.last_error);
       return;
     }
-    this.message = this.generateMessage('UPDATE',res);
   }
 
-  getWidth(): number{
-    return this.width;
-  }
 
-  getState(): number{
-    return this.state;
-  }
-
-  getLastError(): number{
-    return this.last_error;
-  }
-
-  getMessage(): string{
-    return this.message
-  }
+  
 
   async onCloseButton() {
-    var res = 0;
-    var curr_width = await this.xmlrpc.doRequest('gripper_get_width',[]);
-    if (curr_width != ContactileConstants.commandError){
-      var new_width = curr_width-2.0;
-      res = await this.xmlrpc.doRequest('gripper_pc_move_to_width',[new_width]);
-    }else{
-      this.message = this.generateMessage('GET_WIDTH',curr_width);
-      return;
-    }
-    res = await this.xmlrpc.doRequest('gripper_waitUntil_idle_ready',[]);
-    if(res != ContactileConstants.commandSuccess){
-      this.message = this.generateMessage('waitUntil_IDLE_READY',res);
-      return;
+    let res: string = ContactileConstants.commandError;
+    let curr_width: string = await this.xmlrpc.methodCall('gripper_get_width');
+    if (curr_width !== ContactileConstants.commandError){
+      let new_width: number = parseFloat(curr_width);
+      new_width = new_width - 2.0;
+      res = await this.xmlrpc.methodCall('gripper_pc_move_to_width',new_width.toString());
     }
     this.updateAllVals();
-    this.message = this.generateMessage('OPEN',res);
+    console.log("onCloseButton: ", res);
   }
 
   async onOpenButton() {
-    var res = 0;
-    var curr_width = await this.xmlrpc.doRequest('gripper_get_width',[]);
-    if (curr_width != ContactileConstants.commandError){
-      var new_width = curr_width+2.0;
-      res = await this.xmlrpc.doRequest('gripper_pc_move_to_width',[new_width]);
-    }else{
-      this.message = this.generateMessage('GET_WIDTH',curr_width);
-      return;
-    }
-    res = await this.xmlrpc.doRequest('gripper_waitUntil_idle_ready',[]);
-    if(res != ContactileConstants.commandSuccess){
-      this.message = this.generateMessage('waitUntil_IDLE_READY',res);
-      return;
+    let res: string = ContactileConstants.commandError;
+    let curr_width: string = await this.xmlrpc.methodCall('gripper_get_width');
+    if (curr_width !== ContactileConstants.commandError){
+      let new_width: number = parseFloat(curr_width);
+      new_width = new_width + 2.0;
+      res = await this.xmlrpc.methodCall('gripper_pc_move_to_width',new_width.toString());
     }
     this.updateAllVals();
-    this.message = this.generateMessage('OPEN',res);
+    console.log("onOpenButton: ", res);
   }
 
   async onFFGripButton() {
-    var res = await this.xmlrpc.doRequest('gripper_ff_grip',[]);
-    this.message = this.generateMessage('FF_GRIP',res);
+    let res: string = await this.xmlrpc.methodCall('gripper_ff_grip');
+    this.message = this.generateMessage('FF_GRIP', res);
+    console.log("onFFGripButton: ", res);
   }
 
   async onDFGripButton() {
-    var res = await this.xmlrpc.doRequest('gripper_df_grip',[]);
-    this.message = this.generateMessage('DF_GRIP',res);
+    let res: string = await this.xmlrpc.methodCall('gripper_df_grip');
+    this.message = this.generateMessage('DF_GRIP', res);
+    console.log("onDFGripButton: ", res);
   }
 
   async onReleaseButton() {
-    var res = await this.xmlrpc.doRequest('gripper_release',[]);
-    this.message = this.generateMessage('RELEASE',res);
+    let res: string = await this.xmlrpc.methodCall('gripper_release');
+    this.message = this.generateMessage('RELEASE', res);
+    console.log("onReleaseButton: ", res);
   }
 
   async onStopButton() {
-    var res = await this.xmlrpc.doRequest('gripper_stop',[]);
-    this.message = this.generateMessage('STOP',res);
+    let res: string = await this.xmlrpc.methodCall('gripper_stop');
+    this.message = this.generateMessage('STOP', res);
+    console.log("onStopButton: ", res);
   }
 
   async onBiasButton() {
-    var res = await this.xmlrpc.doRequest('gripper_bias',[]);
-    this.message = this.generateMessage('BIAS',res);
+    let res: string = await this.xmlrpc.methodCall('gripper_bias');
+    this.message = this.generateMessage('BIAS', res);
+    console.log("onBiasButton: ", res);
   }
 
   async onResetParamsButton() {
-    var res = await this.xmlrpc.doRequest('gripper_reset_params',[]);
-    this.message = this.generateMessage('RESET_PARAMS',res);
+    let res: string = await this.xmlrpc.methodCall('gripper_reset_params');
+    this.message = this.generateMessage('RESET_PARAMS', res);
+    console.log("onResetParamsButton: ", res);
   }
 
   async onClearErrorStateButton() {
-    var res = await this.xmlrpc.doRequest('gripper_clear_error_state',[]);
+    let res: string = await this.xmlrpc.methodCall('gripper_clear_error_state');
     this.updateAllVals();
-    this.message = this.generateMessage('CLEAR_ERROR_STATE',res);
+    this.message = this.generateMessage('CLEAR_ERROR_STATE', res);
+    console.log("onClearErrorStateButton: ", res);
   }
 
   async onFlushButton() {
-    var res = await this.xmlrpc.doRequest('gripper_flushSerialInputBuffer',[]);
-    this.message = this.generateMessage('FLUSH',res);
+    let res: string = await this.xmlrpc.methodCall('gripper_flushSerialInputBuffer');
+    this.message = this.generateMessage('FLUSH', res);
+    console.log("onFlushButton: ", res);
   }
 
   // call saveNode to save node parameters
@@ -198,11 +169,11 @@ export class ContactileGripperBarComponent implements SidebarItemPresenter {
       //await this.presenterAPI.programNodeService.updateNode(this.contributedNode);
   }
 
-  private generateMessage(commandStr: string, res: number): string{
-      if (res == ContactileConstants.commandSuccess){
+  private generateMessage(commandStr: string, res: string): string{
+      if (res === ContactileConstants.commandSuccess){  // res === 0
           return commandStr + ": Success!";
       }
-      return commandStr + ": Failed. ADD MORE DETAIL.";
+      return commandStr + ": Failed with error code " + res;
   }
   
   protected readonly Object = Object;

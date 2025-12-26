@@ -1,4 +1,4 @@
 export abstract class ContactileConstants{
-    static commandError = -999999;
-    static commandSuccess = 0;
+    static commandError:string = '-999999';
+    static commandSuccess:string = '0';
 }

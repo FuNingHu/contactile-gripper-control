@@ -12,7 +12,8 @@ const createApplicationNode = (): ContactileGripperAppNode => ({
 const generatePreambleScriptCode = () => {
     const builder = new ScriptBuilder();
     builder.comment('Contactile Gripper Preamble');
-    builder.addStatements('set_tool_communication(True, 115200, 0, 1, 1.5, 3.5');
+    builder.addStatements('set_tool_voltage(24)');
+    builder.addStatements('set_tool_communication(True, 115200, 0, 1, 1.5, 3.5)');
     builder.addStatements('global contactileRPC = rpc_factory("xmlrpc", "http://servicegateway/universal-robots/contactile-gripper/contactile-gripper-backend/xmlrpc/")');
     builder.globalVariable('g_returnStatus', '-999999');
     builder.globalVariable('g_width', '-999999');
@@ -22,7 +23,7 @@ const generatePreambleScriptCode = () => {
     builder.addStatements('global g_tactile_glob = [0,0,0,0,0,0,0,0,0,0,0,0,0,0]');
     builder.addStatements('global g_state = -999999');
     builder.addStatements('global g_last_error = -999999');
-    builder.comment('#####################################################');
+    builder.comment('Contactile Gripper Preamble End');
     return builder;
 };
 

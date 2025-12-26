@@ -9,7 +9,7 @@
 <div *ngIf="robotSettings" class="storybook-grid" style="width: 300px;">
     <div class="ur-row ur-gap-07" style="width: 300px; align-content: center; align-items: center;">
         <div style="padding:1px; margin: 0px;"></div>
-        <ur-tile-button (handleClick)="this.onFFGripButton()" [icon]="''" [disabled]="this.isDisable()" [active]="false" style="width: 100px;">
+        <ur-tile-button (handleClick)="this.onFFGripButton()" [disabled]="false" [active]="false" style="width: 100px;">
             <ur-tile-icon>
                 <!--<img src="../../assets/icons/FFGripButton_10.svg">-->
                 <svg
@@ -135,7 +135,7 @@
             </ur-tile-icon>
             <!--FF_GRIP-->
         </ur-tile-button>
-        <ur-tile-button (handleClick)="this.onOpenButton()" [icon]="''" [disabled]="this.isDisable()" [active]="false" style="width: 100px;">
+        <ur-tile-button (handleClick)="this.onOpenButton()" [disabled]="false" [active]="false" style="width: 100px;">
             <ur-tile-icon>
                 <!--<img src="../../assets/icons/OpenButton_10.svg">-->
                 <svg
@@ -297,7 +297,7 @@
     <br>
     <div class="ur-row ur-gap-07" style="width: 300px;">
         <div style="padding:1px; margin: 0px;"></div>
-        <ur-tile-button (handleClick)="this.onDFGripButton()" [icon]="''" [disabled]="this.isDisable()" [active]="false" style="width: 100px;">
+        <ur-tile-button (handleClick)="this.onDFGripButton()" [disabled]="false" [active]="false" style="width: 100px;">
             <ur-tile-icon>
                 <!--<img src="../../assets/icons/DFGripButton_10.svg">-->
                 <svg
@@ -423,7 +423,7 @@
             </ur-tile-icon>
             <!--DF_GRIP-->
         </ur-tile-button>
-        <ur-tile-button (handleClick)="this.onCloseButton()" [icon]="''" [disabled]="this.isDisable()" [active]="false" style="width: 100px;">
+        <ur-tile-button (handleClick)="this.onCloseButton()" [disabled]="false" [active]="false" style="width: 100px;">
             <ur-tile-icon>
                 <!--<img src="../../assets/icons/CloseButton_10.svg">-->
                 <svg
@@ -588,7 +588,7 @@
     <br>
     <div class="ur-row ur-gap-07" style="width: 300px;">
         <div style="padding:1px; margin: 0px;"></div>
-        <ur-tile-button (handleClick)="this.onReleaseButton()" [icon]="''" [disabled]="this.isDisable()" [active]="false" style="width: 100px;">
+        <ur-tile-button (handleClick)="this.onReleaseButton()" [disabled]="false" [active]="false" style="width: 100px;">
         <ur-tile-icon>
             <!--<img src="../../assets/icons/ReleaseButton.svg">-->
             <svg
@@ -714,7 +714,7 @@
         </ur-tile-icon>
             <!--RELEASE-->
         </ur-tile-button>
-        <ur-tile-button (handleClick)="this.onStopButton()" [icon]="''" [disabled]="this.isDisable()" [active]="false" style="width: 100px;">
+        <ur-tile-button (handleClick)="this.onStopButton()" [disabled]="false" [active]="false" style="width: 100px;">
             <ur-tile-icon>
                 <!--<img src="../../assets/icons/StopButton.svg">-->
                 <svg
@@ -812,19 +812,19 @@
     <div class="ur-row ur-gap-07" style="width: 300px;">
         <div style="padding:1px; margin: 0px;"></div>
         <ur-label [label]="'WIDTH: '" style="width:100px; text-align:left;"></ur-label>
-        <ur-label [label]="this.getWidth().toString()" style="width:100px; text-align:right;"></ur-label>
+        <ur-label [label]="width" style="width:100px; text-align:right;"></ur-label>
     </div>
     <br>
     <div class="ur-row ur-gap-07" style="width: 300px;">
         <div style="padding:1px; margin: 0px;"></div>
         <ur-label [label]="'STATE: '" style="width:100px; text-align:left;"></ur-label>
-        <ur-label [label]="this.getState().toString()" style="width:100px; text-align:right;"></ur-label>
+        <ur-label [label]="state" style="width:100px; text-align:right;"></ur-label>
     </div>
     <br>
     <div class="ur-row ur-gap-07" style="width: 300px;">
         <div style="padding:1px; margin: 0px;"></div>
         <ur-label [label]="'LAST_ERROR:'" style="width:100px; text-align:left;"></ur-label>
-        <ur-label [label]="this.getLastError().toString()" style="width:100px; text-align:right;"></ur-label>
+        <ur-label [label]="last_error" style="width:100px; text-align:right;"></ur-label>
     </div>
     <br>
     <div class="ur-row ur-gap-07" style="width: 300px;">
@@ -832,7 +832,7 @@
         <ur-button
             (clicked)="this.updateAllVals()"
             type="filled"
-            [disabled]="this.isDisable()"
+            [disabled]="false"
             icon=""
             iconAlign="left"
             [active]="false"
@@ -851,7 +851,7 @@
         <ur-button
             (clicked)="this.onBiasButton()"
             type="filled"
-            [disabled]="this.isDisable()"
+            [disabled]="false"
             icon=""
             iconAlign="left"
             [active]="false"
@@ -862,7 +862,7 @@
         <ur-button
             (clicked)="this.onResetParamsButton()"
             type="filled"
-            [disabled]="this.isDisable()"
+            [disabled]="false"
             icon=""
             iconAlign="left"
             [active]="false"
@@ -877,7 +877,7 @@
         <ur-button
             (clicked)="this.onFlushButton()"
             type="filled"
-            [disabled]="this.isDisable()"
+            [disabled]="false"
             icon=""
             iconAlign="left"
             [active]="false"
@@ -888,7 +888,7 @@
         <ur-button
             (clicked)="this.onClearErrorStateButton()"
             type="filled"
-            [disabled]="this.isDisable()"
+            [disabled]="false"
             icon=""
             iconAlign="left"
             [active]="false"
@@ -911,7 +911,7 @@
     <div class="ur-row ur-gap-07" style="width: 300px;">
         <div style="padding:1px; margin: 0px;"></div>
         <ur-thing-card style="width: 300px;">
-            <p><ur-label [label]="this.getMessage()"></ur-label></p>
+            <p><ur-label [label]="message"></ur-label></p>
         </ur-thing-card>
     </div>
 </div>

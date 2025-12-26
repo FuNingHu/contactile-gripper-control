@@ -12,7 +12,7 @@
       <ur-toggle-switch 
         (handleToggle)="this.handleToggle($event)" 
         [disabled]="!isDaemonReachable"
-        [toggle]="this.applicationNode.isSerialConnected"></ur-toggle-switch>
+        [toggled]="this.applicationNode.isSerialConnected"></ur-toggle-switch>
       
       <ur-label [label]="'Open'" [size]="'medium'"></ur-label>
     </div>

@@ -5,7 +5,7 @@ import { ApplicationPresenterAPI, ApplicationPresenter, RobotSettings } from '@u
 import { URCAP_ID, VENDOR_ID } from '../../../generated/contribution-constants';
 import { ContactileGripperAppNode } from './contactile-gripper-app.node';
 import {ContactileConstants} from '../../../contactile-constants';
-import { XmlRpcClient } from 'src/app/xmlrpc/xmlrpc-client';
+import { XmlRpcClient } from 'src/app/components/xmlrpc/xmlrpc-client';
 
 
 @Component({
@@ -169,12 +169,12 @@ export class ContactileGripperAppComponent implements ApplicationPresenter, OnCh
         return "Gripper Response";
     }
 
-    private generateMessage(commandStr: string, res: number): string{
-        if (res == ContactileConstants.commandSuccess){
-            return commandStr + ": Success!";
-        }
-        return commandStr + ": Failed. ADD MORE DETAIL.";
-    }
+    // private generateMessage(commandStr: string, res: number): string{
+    //     if (res == ContactileConstants.commandSuccess){
+    //         return commandStr + ": Success!";
+    //     }
+    //     return commandStr + ": Failed. ADD MORE DETAIL.";
+    // }
     // call saveNode to save node parameters
     saveNode() {
         this.cd.detectChanges();

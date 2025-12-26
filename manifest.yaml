@@ -3,7 +3,7 @@ metadata:
   urcapID: "contactile-gripper"
   vendorName: "Contactile"
   urcapName: "Contactile Gripper"
-  version: 1.0.0
+  version: 1.2.0
 artifacts:
   webArchives:
   - id: "contactile-gripper-frontend"

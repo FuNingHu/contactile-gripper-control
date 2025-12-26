@@ -34,7 +34,7 @@ class MultithreadedSimpleXMLRPCServer(ThreadingMixIn, SimpleXMLRPCServer):
 def isReachable():
 	return True
 
-comPortStr = "/dev/ttyTool"
+comPortStr = "/dev/ur-ttylink/ttyTool"
 gripper = GripperClass.GripperClass_NoProcess(comPortStr)
 
 server = MultithreadedSimpleXMLRPCServer(("0.0.0.0", CONTACTILE_RS485_PORT), requestHandler=RequestHandler)
