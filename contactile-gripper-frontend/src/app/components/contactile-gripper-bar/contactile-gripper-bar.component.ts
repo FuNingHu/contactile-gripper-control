@@ -68,9 +68,9 @@ export class ContactileGripperBarComponent implements SidebarItemPresenter {
       //   this.enableDisableAll(res));
   }
 
-  async updateAllVals(){
+  async updateAllVals() {
     this.width = await this.xmlrpc.methodCall('gripper_get_width');
-    if (this.width === ContactileConstants.commandError){
+    if (this.width === ContactileConstants.commandError) {
       this.message = this.generateMessage('GET_WIDTH', this.width);
       return;
     }
@@ -94,10 +94,9 @@ export class ContactileGripperBarComponent implements SidebarItemPresenter {
   async onCloseButton() {
     let res: string = ContactileConstants.commandError;
     let curr_width: string = await this.xmlrpc.methodCall('gripper_get_width');
-    if (curr_width !== ContactileConstants.commandError){
-      let new_width: number = parseFloat(curr_width);
-      new_width = new_width - 2.0;
-      res = await this.xmlrpc.methodCall('gripper_pc_move_to_width',new_width.toString());
+    if (curr_width !== ContactileConstants.commandError && !isNaN(parseFloat(curr_width))){
+      let new_width: number = parseFloat(curr_width) - 2.0;
+      res = await this.xmlrpc.methodCall('gripper_pc_move_to_width', new_width);
     }
     this.updateAllVals();
     console.log("onCloseButton: ", res);
@@ -106,10 +105,9 @@ export class ContactileGripperBarComponent implements SidebarItemPresenter {
   async onOpenButton() {
     let res: string = ContactileConstants.commandError;
     let curr_width: string = await this.xmlrpc.methodCall('gripper_get_width');
-    if (curr_width !== ContactileConstants.commandError){
-      let new_width: number = parseFloat(curr_width);
-      new_width = new_width + 2.0;
-      res = await this.xmlrpc.methodCall('gripper_pc_move_to_width',new_width.toString());
+    if (curr_width !== ContactileConstants.commandError && !isNaN(parseFloat(curr_width))){
+      let new_width: number = parseFloat(curr_width) + 2.0;
+      res = await this.xmlrpc.methodCall('gripper_pc_move_to_width', new_width);
     }
     this.updateAllVals();
     console.log("onOpenButton: ", res);

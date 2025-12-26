@@ -34,6 +34,8 @@ export class XmlRpcClient {
             throw new Error(`XML-RPC call "${method}" to ${this.url} returned ${res.status}: "${res.statusText}"`);
         }
 
+        
+
         return deserializeMethodResponse(await res.text());
     }
     

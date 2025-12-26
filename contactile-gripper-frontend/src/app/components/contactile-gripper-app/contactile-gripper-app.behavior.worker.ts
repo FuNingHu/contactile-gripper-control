@@ -1,6 +1,7 @@
 /// <reference lib="webworker" />
 import { ApplicationBehaviors, registerApplicationBehavior, ScriptBuilder } from '@universal-robots/contribution-api';
 import { ContactileGripperAppNode } from './contactile-gripper-app.node';
+import { URCAP_ID, VENDOR_ID } from 'src/generated/contribution-constants';
 
 const createApplicationNode = (): ContactileGripperAppNode => ({
     type: 'contactile-contactile-gripper-contactile-gripper-app', // type is required
@@ -14,7 +15,8 @@ const generatePreambleScriptCode = () => {
     builder.comment('Contactile Gripper Preamble');
     builder.addStatements('set_tool_voltage(24)');
     builder.addStatements('set_tool_communication(True, 115200, 0, 1, 1.5, 3.5)');
-    builder.addStatements('global contactileRPC = rpc_factory("xmlrpc", "http://servicegateway/universal-robots/contactile-gripper/contactile-gripper-backend/xmlrpc/")');
+    const url = `servicegateway/${VENDOR_ID}/${URCAP_ID}/contactile-gripper-backend/xmlrpc/`;
+    builder.assign('contactileRPC', `rpc_factory("xmlrpc", "${location.protocol}//${url}/")`);
     builder.globalVariable('g_returnStatus', '-999999');
     builder.globalVariable('g_width', '-999999');
     builder.globalVariable('g_velocity', '-999999');
