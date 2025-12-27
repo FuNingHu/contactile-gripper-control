@@ -3,7 +3,7 @@ metadata:
   urcapID: "contactile-gripper"
   vendorName: "Contactile"
   urcapName: "Contactile Gripper"
-  version: 1.2.2
+  version: 1.2.3
 artifacts:
   webArchives:
   - id: "contactile-gripper-frontend"
@@ -19,4 +19,5 @@ artifacts:
         proxyUrl: /
     devices:
       - type: ttyTool
+    startup: auto
   

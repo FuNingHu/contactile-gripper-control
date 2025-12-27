@@ -127,7 +127,7 @@ class GripperClass_NoProcess:
 
 	# Builds the command string and sends it to the gripper 
 	def __sendGripperCommand__(self, cmdStr):
-		nWritten = self.gripperSerialPort.write(cmdStr) # bytes(cmdStr,'ascii'))
+		nWritten = self.gripperSerialPort.write(bytes(cmdStr, 'ascii'))
 		if IS_DEBUG:
 			print('DBG: GripperClass.sendGripperCommand: Sent ' + str(nWritten) + ' characters')
 		return nWritten > 0
@@ -138,7 +138,12 @@ class GripperClass_NoProcess:
 	def __resolveRetVals__(self, argStrs):
 		retVals = list()
 		for returnStr in argStrs:
-			retVals.append(float(returnStr))
+			try:
+				retVals.append(float(returnStr))
+			except (ValueError, TypeError) as e:
+				if IS_DEBUG:
+					logger.error(f'ERR: __resolveRetVals__: Cannot convert "{returnStr}" to float: {e}')
+				retVals.append(float(COMMAND_FAIL))
 		return retVals
 	# Read a response from the gripper
 	# Returns the command name <CMD_NAME> string, command ID <ID> integer, response type <RSP_TYPE> string and any return values <ARGS> list of floats
