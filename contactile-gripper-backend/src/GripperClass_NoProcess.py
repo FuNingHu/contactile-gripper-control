@@ -46,61 +46,43 @@ def buildGripperCommand(commandName, argStrs):
 			cmdStr = cmdStr + str(argStrs[argInd])
 			if argInd < len(argStrs)-1:
 				cmdStr = cmdStr + gripConsts.ARG_DELIM
-	cmdStr = cmdStr + gripConsts.CMD_END
+	cmdStr = cmdStr + gripConsts.CMD_END  # Add newline as command terminator
 	if IS_DEBUG:
-		print('DBG: buildGripperCommand: ' + cmdStr)
+		print('DBG: buildGripperCommand: ' + cmdStr.strip())
 	return cmdStr
 class GripperClass_NoProcess:
 	## INIT
-	def __init__(self):
-		self.gripperSerialPort = None
-	#	self.gripperSerialPort.port = comPortStr
-	#	self.gripperSerialPort.baudrate = 115200
-	#	self.gripperSerialPort.parity = serial.PARITY_ODD 	# Testing to match set_communications_tool in URScript
-	#	self.gripperSerialPort.stopbits = serial.STOPBITS_ONE 	# Testing to match set_communications_tool in URScript
-	#	self.gripperSerialPort.timeout = TIMEOUT_READ # Time in s 
+	def __init__(self, comPortStr):
+		self.gripperSerialPort = serial.Serial()
+		self.gripperSerialPort.port = comPortStr
+		self.gripperSerialPort.baudrate = 115200
+		self.gripperSerialPort.parity = serial.PARITY_ODD 	# Testing to match set_communications_tool in URScript
+		self.gripperSerialPort.stopbits = serial.STOPBITS_ONE 	# Testing to match set_communications_tool in URScript
+		self.gripperSerialPort.timeout = TIMEOUT_READ # Time in s 
+		
 		self.buf = bytearray()
 	## HELPERS
 	def isSerialOpen(self):
-		global IS_CONNECTED
-		return IS_CONNECTED
-	def serialStart(self, port_name):
-		global IS_CONNECTED
-		logger.info("Attempting to open serial port: %s" % port_name)
+		return self.gripperSerialPort.is_open
+	def serialStart(self):
 		try:
-			self.gripperSerialPort = serial.Serial(
-				port=port_name, 
-				baudrate=115200, 
-				bytesize=8,
-				parity=serial.PARITY_ODD,  # Match UR set_communications_tool default
-				stopbits=serial.STOPBITS_ONE,  # Use constant
-				timeout=1.0
-			)
-			if self.gripperSerialPort.is_open:
-				IS_CONNECTED = True
-				logger.info("Serial port opened successfully")
-			else:
-				logger.error("Failed to open serial port: %s" % port_name)
-		except Exception as e:
-			logger.error("Failed to open serial port: %s" % str(e))
+			self.gripperSerialPort.open()
+		except:
+			print('ERR: GripperClass.serialStart: Failed to open COMPORT')
 		return self.isSerialOpen()
+
 	def serialStop(self):
-		global IS_CONNECTED
-		logger.info("Attempting to close serial port:" )
 		try:
-			if self.gripperSerialPort is not None:			
-				logger.info("Serial port closed successfully")
-				self.gripperSerialPort.close()
-				IS_CONNECTED = False
-				self.gripperSerialPort = None
-			else: 
-				logger.error("Failed to close serial port")
-		except Exception as e:
-			logger.error("Failed to close serial port: %s" % str(e))
+			self.gripperSerialPort.reset_input_buffer()
+			self.gripperSerialPort.close()
+		except:
+			print('ERR: GripperClass.serialStop: Failed to close COMPORT')
 		return not self.isSerialOpen()
+
+
 	# Flush the serial input buffer - in case command/response is out of synch
 	def __flushSerialInputBuffer__(self):
-		if self.gripperSerialPort is None or not self.gripperSerialPort.is_open:
+		if not self.gripperSerialPort.is_open:
 			if IS_DEBUG:
 				print('DBG: GripperClass.flushSerialInputBuffer: COMPORT not open')
 			return COMMAND_SUCCESS
@@ -112,13 +94,9 @@ class GripperClass_NoProcess:
 		if IS_DEBUG:
 			print('DBG: GripperClass.flushSerialInputBuffer: Flushed')
 		return COMMAND_SUCCESS
+
+
 	def __readLine__(self):
-		# 检查串口是否存在
-		if self.gripperSerialPort is None:
-			if IS_DEBUG:
-				print('DBG: GripperClass.readLine: Serial port is None')
-			return ""
-		
 		start_time = time.time()
 		i = self.buf.find(b"\n")
 		if i >= 0:
@@ -131,16 +109,9 @@ class GripperClass_NoProcess:
 			return strResult
 		while True:
 			if time.time() - start_time > TIMEOUT_RESPONSE:
-				if IS_DEBUG:
-					print('DBG: GripperClass.readLine: Timeout waiting for response')
 				return ""
-			try:
-				i = max(1,min(2048,self.gripperSerialPort.in_waiting))
-				data = self.gripperSerialPort.read(i)
-			except Exception as e:
-				if IS_DEBUG:
-					print(f'ERR: GripperClass.readLine: {type(e).__name__}: {str(e)}')
-				return ""
+			i = max(1,min(2048,self.gripperSerialPort.in_waiting))
+			data = self.gripperSerialPort.read(i)
 			i = data.find(b"\n")
 			if i >= 0:
 				r = self.buf + data[:i+1]
@@ -152,23 +123,16 @@ class GripperClass_NoProcess:
 				return strResult
 			else:
 				self.buf.extend(data)
+
+
 	# Builds the command string and sends it to the gripper 
 	def __sendGripperCommand__(self, cmdStr):
-		# 检查串口是否存在
-		if self.gripperSerialPort is None:
-			if IS_DEBUG:
-				logger.info('DBG: GripperClass.sendGripperCommand: Serial port is None')
-			return False
-		try:
-			# Convert string to bytes before writing
-			nWritten = self.gripperSerialPort.write(bytes(cmdStr, 'ascii'))
-			if IS_DEBUG:
-				logger.info('DBG: GripperClass.sendGripperCommand: Sent ' + str(nWritten) + ' characters')
-			return nWritten > 0
-		except Exception as e:
-			if IS_DEBUG:
-				logger.error(f'ERR: GripperClass.sendGripperCommand: {type(e).__name__}: {str(e)}')
-			return False
+		nWritten = self.gripperSerialPort.write(cmdStr) # bytes(cmdStr,'ascii'))
+		if IS_DEBUG:
+			print('DBG: GripperClass.sendGripperCommand: Sent ' + str(nWritten) + ' characters')
+		return nWritten > 0
+
+
 
 	# Helper function for the getGripperResponse function
 	def __resolveRetVals__(self, argStrs):
@@ -213,9 +177,13 @@ class GripperClass_NoProcess:
 				cmdId = int(responsePart[-1])
 		elif recLine.find(gripConsts.DATA_STREAM_STR) == -1:
 			print('ERR: Malformed response: ' + recLine)
+
 		if IS_DEBUG:
 			print('DBG: GripperClass.getGripperResponse: Read ' + recLine )
+
 		return cmdStr, cmdId, respType, retVals
+
+
 	# Check the acknowledgement to a command
 	def __checkCommandAcknowledge__(self, cmdStr, cmdId, respType, retVals, commandName, argStrs=list(), expectedNRet=0):
 		if cmdStr != commandName:           # Check if this is a response to the correct command
@@ -231,12 +199,16 @@ class GripperClass_NoProcess:
 				print('DBG: GripperClass.checkCommandAcknowledge: Wrong number of returns; Expected: ' + str(expectedNRet) + '; Found: ' + str(len(retVals)))
 			return ERR_N_RET
 		return COMMAND_SUCCESS
+
+
 	def __queueGripperCommand__(self, commandName, argStrs=list()):
 		# self.command_q.put(buildGripperCommand(commandName, argStrs))
 		nWritten = self.__sendGripperCommand__(buildGripperCommand(commandName, argStrs))
 		if IS_DEBUG:
-			logger.info('DBG: GripperClass.queueGripperCommand: Queued ' + commandName)
+			print('DBG: GripperClass.queueGripperCommand: Queued ' + commandName)
 		return nWritten
+
+
 	def __getQueuedGripperResponse__(self,defaultReturn=''):
 		# while self.response_q.empty():
 		#     time.sleep(0.01)
@@ -247,22 +219,28 @@ class GripperClass_NoProcess:
 		# retVals = resp[3]
 		# return cmdStr, cmdId, respType, retVals
 		return self.__getGripperResponse__()
+
+
 	def __getVariable__(self,commandStr,expectedNRet):
 		defaultReturn = ''
 		nWritten = self.__queueGripperCommand__(commandStr,list()) 
 		cmdStr,cmdId,respType,retVals = self.__getQueuedGripperResponse__(defaultReturn='') 
 		if self.__checkCommandAcknowledge__(cmdStr,cmdId,respType,retVals,commandStr,list(),expectedNRet) != COMMAND_SUCCESS:
 			if IS_DEBUG:
-				logger.info('DBG: GripperClass.getVariable: Failed')
+				print('DBG: GripperClass.getVariable: Failed')
 			return list()
 		return retVals
+
+
 	def __getFloat__(self,commandStr,defaultFloatReturn):
 		retVals = self.__getVariable__(commandStr,1)
 		if len(retVals) == 0:
 			if IS_DEBUG:
-				logger.info('DBG: GripperClass.getFloat: Failed')
+				print('DBG: GripperClass.getFloat: Failed')
 			return defaultFloatReturn
 		return retVals[0]
+
+
 	def __getInt__(self,commandStr,defaultIntReturn):
 		retVals = self.__getVariable__(commandStr,1)
 		if len(retVals) == 0:
@@ -270,6 +248,8 @@ class GripperClass_NoProcess:
 				print('DBG: GripperClass.getInt: Failed')
 			return defaultIntReturn
 		return retVals[0]
+
+
 	def __getFloatList__(self,commandStr,defaultListReturn):
 		retVals = self.__getVariable__(commandStr,len(defaultListReturn))
 		if len(retVals) == 0:
@@ -277,6 +257,8 @@ class GripperClass_NoProcess:
 				print('DBG: GripperClass.getFloatList: Failed')
 			return defaultListReturn
 		return retVals
+
+
 	def __setVariable__(self,commandStr,argumentList):
 		self.__queueGripperCommand__(commandStr,argumentList) 
 		cmdStr,cmdId,respType,retVals = self.__getQueuedGripperResponse__(defaultReturn='')
@@ -287,10 +269,14 @@ class GripperClass_NoProcess:
 			print('ERR: ' + commandStr + '(' + str(argumentList) + '): Invalid values')
 			return ERR_INVALID_ARG
 		return ERR_RECIEVE
+
+
 	def __emptyCommand__(self,commandStr):
 		self.__queueGripperCommand__(commandStr,list()) 
 		cmdStr,cmdId,respType,retVals = self.__getQueuedGripperResponse__(defaultReturn='')
 		return self.__checkCommandAcknowledge__(cmdStr,cmdId,respType,retVals,commandStr,list(),0)
+
+
 	## COMMANDS: DATA STREAMING
 	def data_stream(self):              # Sends DATA_STREAM, checks acknowledgement
 		return self.__emptyCommand__(gripConsts.DATA_STREAM_STR)

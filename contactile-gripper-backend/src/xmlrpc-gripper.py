@@ -32,7 +32,7 @@ class MultithreadedSimpleXMLRPCServer(ThreadingMixIn, SimpleXMLRPCServer):
 
 
 comPortStr = "/dev/ur-ttylink/ttyTool"
-gripper = GripperClass.GripperClass_NoProcess()
+gripper = GripperClass.GripperClass_NoProcess(comPortStr)
 # Don't auto-start serial - let frontend control it
 # gripper.serialStart(comPortStr)
 
