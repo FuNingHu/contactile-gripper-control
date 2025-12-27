@@ -1,18 +1,13 @@
 #!/usr/bin/env python
 
-import sys
-import socket
 from logger import *
 from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.server import SimpleXMLRPCRequestHandler
 from socketserver import ThreadingMixIn
-import time
-import serial
 
 import GripperClass_NoProcess as GripperClass
-import GripperConstants as GripperConstants
 
-LOCALHOST = "127.0.0.1"
+LOCALHOST = "0.0.0.0"
 CONTACTILE_RS485_PORT = 36963
 G_TEXT = "Hello, Contactile Gripper!";
 # XMLRPC_PORT = 40405
@@ -26,10 +21,9 @@ else:
 
 class RequestHandler(SimpleXMLRPCRequestHandler):
 	rpc_paths = ('/',)
-
+	
 	def log_message(self, format, *args):
-		pass
-
+		pass  # Suppress default logging
 
 class MultithreadedSimpleXMLRPCServer(ThreadingMixIn, SimpleXMLRPCServer):
 	pass
@@ -39,7 +33,7 @@ class MultithreadedSimpleXMLRPCServer(ThreadingMixIn, SimpleXMLRPCServer):
 
 comPortStr = "/dev/ur-ttylink/ttyTool"
 gripper = GripperClass.GripperClass_NoProcess()
-# Don't auto-start serial port - let frontend control it
+# Don't auto-start serial - let frontend control it
 # gripper.serialStart(comPortStr)
 
 def isReachable():
@@ -54,17 +48,6 @@ def getText():
 	global G_TEXT
 	return G_TEXT
 
-def serialStart(port_name):
-	global gripper
-	return gripper.serialStart(port_name)
-
-def serialStop():
-	global gripper
-	return gripper.serialStop()
-
-def isSerialOpen():
-	global gripper
-	return gripper.isSerialOpen()
 
 
 
@@ -74,9 +57,10 @@ server.RequestHandlerClass.protocol_version = "HTTP/1.1"
 Logger.info(f'Gripper XMLRPC server started on port {CONTACTILE_RS485_PORT}')
 
 server.register_function(isReachable, 				"isReachable")
-
-server.register_function(serialStart, 		"serialStart")
-server.register_function(serialStop, 		"serialStop")
+server.register_function(setText, 					"setText")
+server.register_function(getText, 					"getText")
+server.register_function(gripper.serialStart, 		"serialStart")
+server.register_function(gripper.serialStop, 		"serialStop")
 server.register_function(gripper.isSerialOpen,		"isSerialOpen")
 
 server.register_function(gripper.get_width,			"gripper_get_width")
@@ -115,6 +99,5 @@ server.register_function(gripper.waitUntil_ff_hold,	"gripper_waitUntil_ff_hold")
 server.register_function(gripper.waitUntil_df_hold,	"gripper_waitUntil_df_hold")
 
 server.register_function(gripper.__flushSerialInputBuffer__, "gripper_flushSerialInputBuffer")
-server.register_function(getText, "getText")
-server.register_function(setText, "setText")
+
 server.serve_forever()

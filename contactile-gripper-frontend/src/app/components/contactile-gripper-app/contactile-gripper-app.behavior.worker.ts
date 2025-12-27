@@ -14,7 +14,7 @@ const generatePreambleScriptCode = () => {
     const builder = new ScriptBuilder();
     builder.comment('Contactile Gripper Preamble');
     builder.addStatements('set_tool_voltage(24)');
-    builder.addStatements('set_tool_communication(True, 115200, 0, 1, 1.5, 3.5)');
+    builder.addStatements('set_tool_communication(True, 115200, 1, 1, 1.5, 3.5)');
     const url = `servicegateway/${VENDOR_ID}/${URCAP_ID}/contactile-gripper-backend/xmlrpc/`;
     builder.assign('contactileRPC', `rpc_factory("xmlrpc", "${location.protocol}//${url}/")`);
     builder.globalVariable('g_returnStatus', '-999999');
