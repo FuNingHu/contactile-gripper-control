@@ -46,7 +46,7 @@ def buildGripperCommand(commandName, argStrs):
 			cmdStr = cmdStr + str(argStrs[argInd])
 			if argInd < len(argStrs)-1:
 				cmdStr = cmdStr + gripConsts.ARG_DELIM
-	cmdStr = cmdStr + gripConsts.CMD_END  # Add newline as command terminator
+	cmdStr = cmdStr + gripConsts.CMD_END + gripConsts.NEW_LINE  # Add $ and newline as command terminator
 	if IS_DEBUG:
 		print('DBG: buildGripperCommand: ' + cmdStr.strip())
 	return cmdStr
@@ -56,7 +56,7 @@ class GripperClass_NoProcess:
 		self.gripperSerialPort = serial.Serial()
 		self.gripperSerialPort.port = comPortStr
 		self.gripperSerialPort.baudrate = 115200
-		self.gripperSerialPort.parity = serial.PARITY_ODD 	# Testing to match set_communications_tool in URScript
+		self.gripperSerialPort.parity = serial.PARITY_NONE 	# Testing to match set_communications_tool in URScript
 		self.gripperSerialPort.stopbits = serial.STOPBITS_ONE 	# Testing to match set_communications_tool in URScript
 		self.gripperSerialPort.timeout = TIMEOUT_READ # Time in s 
 		
@@ -66,18 +66,31 @@ class GripperClass_NoProcess:
 		return self.gripperSerialPort.is_open
 	def serialStart(self):
 		try:
+			if self.gripperSerialPort.is_open:
+				logger.info('Serial port already open')
+				return True
 			self.gripperSerialPort.open()
-		except:
-			print('ERR: GripperClass.serialStart: Failed to open COMPORT')
-		return self.isSerialOpen()
+			logger.info('Serial port opened successfully: {}'.format(self.gripperSerialPort.port))
+			# Clear any initial garbage data
+			self.gripperSerialPort.reset_input_buffer()
+			return True
+		except Exception as e:
+			logger.error('Failed to open serial port {}: {}'.format(self.gripperSerialPort.port, str(e)))
+			# This is expected if hardware is not connected - not a critical error
+			return False
 
 	def serialStop(self):
 		try:
+			if not self.gripperSerialPort.is_open:
+				logger.info('Serial port already closed')
+				return True
 			self.gripperSerialPort.reset_input_buffer()
 			self.gripperSerialPort.close()
-		except:
-			print('ERR: GripperClass.serialStop: Failed to close COMPORT')
-		return not self.isSerialOpen()
+			logger.info('Serial port closed successfully')
+			return True
+		except Exception as e:
+			logger.error('Failed to close serial port: {}'.format(str(e)))
+			return False
 
 
 	# Flush the serial input buffer - in case command/response is out of synch
@@ -104,21 +117,37 @@ class GripperClass_NoProcess:
 			self.buf = self.buf[i+1:]
 			try:
 				strResult = r.decode('ASCII')
-			except:
+				if IS_DEBUG:
+					print('DBG: __readLine__: Received from buffer: {}'.format(repr(strResult)))
+			except Exception as e:
+				if IS_DEBUG:
+					print('DBG: __readLine__: ASCII decode failed: {} (bytes: {})'.format(str(e), repr(r)))
 				strResult = ""
 			return strResult
 		while True:
 			if time.time() - start_time > TIMEOUT_RESPONSE:
+				if IS_DEBUG:
+					print('DBG: __readLine__: Timeout after {} seconds, no data received'.format(TIMEOUT_RESPONSE))
 				return ""
-			i = max(1,min(2048,self.gripperSerialPort.in_waiting))
+			# Check how much data is waiting
+			waiting = self.gripperSerialPort.in_waiting
+			if waiting > 0 and IS_DEBUG:
+				print('DBG: __readLine__: {} bytes waiting'.format(waiting))
+			i = max(1,min(2048,waiting))
 			data = self.gripperSerialPort.read(i)
+			if data and IS_DEBUG:
+				print('DBG: __readLine__: Read {} bytes: {}'.format(len(data), repr(data)))
 			i = data.find(b"\n")
 			if i >= 0:
 				r = self.buf + data[:i+1]
 				self.buf[0:] = data[i+1:]
 				try:
 					strResult = r.decode('ASCII').strip()
-				except:
+					if IS_DEBUG:
+						print('DBG: __readLine__: Received complete line: {}'.format(repr(strResult)))
+				except Exception as e:
+					if IS_DEBUG:
+						print('DBG: __readLine__: ASCII decode failed: {} (bytes: {})'.format(str(e), repr(r)))
 					strResult = ""
 				return strResult
 			else:
@@ -127,9 +156,13 @@ class GripperClass_NoProcess:
 
 	# Builds the command string and sends it to the gripper 
 	def __sendGripperCommand__(self, cmdStr):
-		nWritten = self.gripperSerialPort.write(bytes(cmdStr, 'ascii'))
+		# In Python 2, str is bytes; in Python 3, we need to encode
+		# pyserial 3.x handles both, but we ensure compatibility
+		nWritten = self.gripperSerialPort.write(cmdStr) # bytes(cmdStr,'ascii'))
 		if IS_DEBUG:
-			print('DBG: GripperClass.sendGripperCommand: Sent ' + str(nWritten) + ' characters')
+			print('DBG: GripperClass.sendGripperCommand: Sent {} characters: {}'.format(nWritten, repr(cmdStr)))
+			# Flush to ensure data is sent immediately
+			self.gripperSerialPort.flush()
 		return nWritten > 0
 
 
@@ -142,7 +175,7 @@ class GripperClass_NoProcess:
 				retVals.append(float(returnStr))
 			except (ValueError, TypeError) as e:
 				if IS_DEBUG:
-					logger.error(f'ERR: __resolveRetVals__: Cannot convert "{returnStr}" to float: {e}')
+					logger.error('ERR: __resolveRetVals__: Cannot convert "{}" to float: {}'.format(returnStr, e))
 				retVals.append(float(COMMAND_FAIL))
 		return retVals
 	# Read a response from the gripper
@@ -154,13 +187,24 @@ class GripperClass_NoProcess:
 		retVals = list()
 		# Read a line from the COM Port
 		recLine = self.__readLine__()
+		
+		# Check if we received an empty line
+		if not recLine or not recLine.strip():
+			if IS_DEBUG:
+				print('DBG: __getGripperResponse__: Received empty line')
+			return cmdStr, cmdId, respType, retVals
+			
 		# Find special characters
 		cmdStartPos = recLine.find(gripConsts.CMD_START)
 		cmdEndPos = recLine.find(gripConsts.CMD_END)
 		ackDelimPos = recLine.find(gripConsts.ACK_DELIM)
 		argStartPos = recLine.find(gripConsts.ARG_START)
+		
 		if (cmdStartPos == -1) or (cmdEndPos == -1):
-			print('ERR: Received string; not a response to a command: ' + recLine) # or DATA_STREAM data
+			# Received data but not in expected command format
+			if IS_DEBUG:
+				print('DBG: __getGripperResponse__: Not a command response. Received: "{}" (len={})'.format(
+					recLine.replace('\r', '\\r').replace('\n', '\\n'), len(recLine)))
 			return cmdStr, cmdId, respType, retVals
 		# Extract <CMD_NAME> and <ARGS>
 		args = ''
@@ -176,12 +220,14 @@ class GripperClass_NoProcess:
 			# Extract <RSP_TYPE> and <ID>
 			responsePart = recLine[ackDelimPos+1:cmdEndPos].split(gripConsts.ARG_DELIM)
 			if len(responsePart) != 2: # Expecting <RESP_TYP>,<ID>
-				print('ERR: Expected <RESP_TYPE>,<ID> Found: ' + responsePart + '\n')
+				if IS_DEBUG:
+					print('DBG: Expected <RESP_TYPE>,<ID> Found: ' + str(responsePart))
 			else: 
 				respType = responsePart[0]
 				cmdId = int(responsePart[-1])
 		elif recLine.find(gripConsts.DATA_STREAM_STR) == -1:
-			print('ERR: Malformed response: ' + recLine)
+			if IS_DEBUG and recLine.strip():
+				print('DBG: Malformed response: ' + recLine)
 
 		if IS_DEBUG:
 			print('DBG: GripperClass.getGripperResponse: Read ' + recLine )

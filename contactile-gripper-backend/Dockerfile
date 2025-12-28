@@ -1,8 +1,8 @@
-FROM python:3.11-alpine
+FROM python:2.7-alpine
 
 COPY requirements.txt ./
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+#RUN pip install --no-cache-dir -r requirements.txt
 
 ENV APP_NAME xmlrpc-gripper
 WORKDIR /usr/local/src/${APP_NAME}

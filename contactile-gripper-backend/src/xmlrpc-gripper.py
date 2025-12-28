@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
 from logger import *
-from xmlrpc.server import SimpleXMLRPCServer
-from xmlrpc.server import SimpleXMLRPCRequestHandler
-from socketserver import ThreadingMixIn
+from SimpleXMLRPCServer import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
+from SocketServer import ThreadingMixIn
 
 import GripperClass_NoProcess as GripperClass
 
@@ -51,10 +50,10 @@ def getText():
 
 
 
-server = MultithreadedSimpleXMLRPCServer(("0.0.0.0", CONTACTILE_RS485_PORT), requestHandler=RequestHandler)
+server = MultithreadedSimpleXMLRPCServer(("0.0.0.0", CONTACTILE_RS485_PORT), requestHandler=RequestHandler, allow_none=True)
 server.RequestHandlerClass.protocol_version = "HTTP/1.1"
 
-Logger.info(f'Gripper XMLRPC server started on port {CONTACTILE_RS485_PORT}')
+Logger.info('Gripper XMLRPC server started on port {}'.format(CONTACTILE_RS485_PORT))
 
 server.register_function(isReachable, 				"isReachable")
 server.register_function(setText, 					"setText")
