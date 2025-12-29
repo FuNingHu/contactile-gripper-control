@@ -129,11 +129,7 @@ class GripperClass_NoProcess:
 				if IS_DEBUG:
 					print('DBG: __readLine__: Timeout after {} seconds, no data received'.format(TIMEOUT_RESPONSE))
 				return ""
-			# Check how much data is waiting
-			waiting = self.gripperSerialPort.in_waiting
-			if waiting > 0 and IS_DEBUG:
-				print('DBG: __readLine__: {} bytes waiting'.format(waiting))
-			i = max(1,min(2048,waiting))
+			i = max(1,min(2048,self.gripperSerialPort.in_waiting))
 			data = self.gripperSerialPort.read(i)
 			if data and IS_DEBUG:
 				print('DBG: __readLine__: Read {} bytes: {}'.format(len(data), repr(data)))

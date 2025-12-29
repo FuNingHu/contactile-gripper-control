@@ -128,7 +128,7 @@ export class ContactileGripperStateErrorProgComponent implements OnChanges, Prog
                 this.contributedNode.parameters.commandArgArray = [...ContactileGripperStateErrorProgConstants.commandArgDef];
             }
             this.contributedNode.parameters.commandArgArray[index] = $event;
-            this.saveNode;
+            this.saveNode();
         }
     }
 

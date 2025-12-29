@@ -128,7 +128,7 @@ export class ContactileGripperGetDataProgComponent implements OnChanges, Program
                 this.contributedNode.parameters.commandArgArray = [...ContactileGripperGetDataProgConstants.commandArgDef];
             }
             this.contributedNode.parameters.commandArgArray[index] = $event;
-            this.saveNode;
+            this.saveNode();
         }
     }
 

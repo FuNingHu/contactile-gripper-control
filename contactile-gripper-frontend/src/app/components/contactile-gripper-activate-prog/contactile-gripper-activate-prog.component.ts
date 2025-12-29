@@ -128,7 +128,7 @@ export class ContactileGripperActivateProgComponent implements OnChanges, Progra
                 this.contributedNode.parameters.commandArgArray = [...ContactileGripperActivateProgConstants.commandArgDef];
             }
             this.contributedNode.parameters.commandArgArray[index] = $event;
-            this.saveNode;
+            this.saveNode();
         }
     }
 
